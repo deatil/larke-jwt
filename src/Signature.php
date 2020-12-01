@@ -2,6 +2,7 @@
 
 namespace Larke\JWT;
 
+use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Signer\Key;
 
 /**

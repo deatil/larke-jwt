@@ -10,6 +10,7 @@ use Generator;
 
 use Larke\JWT\Contracts\Claim;
 use Larke\JWT\Claim\Validatable;
+use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Signer\Key;
 
 /**

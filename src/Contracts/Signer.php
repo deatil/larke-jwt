@@ -1,9 +1,4 @@
 <?php
-/**
- * This file is part of Larke\JWT, a simple library to handle JWT and JWS
- *
- * @license http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- */
 
 namespace Larke\JWT\Contracts;
 
@@ -13,9 +8,6 @@ use Larke\JWT\Signer\Key;
 
 /**
  * Basic interface for token signers
- *
- * @author Luís Otávio Cobucci Oblonczyk <lcobucci@gmail.com>
- * @since 0.1.0
  */
 interface Signer
 {
