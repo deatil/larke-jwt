@@ -5,12 +5,13 @@ namespace Larke\JWT\Signer\Key;
 use SplFileObject;
 use Throwable;
 
+use Larke\JWT\Contracts\Key;
 use Larke\JWT\Exception\CannotDecodeContent;
 
-final class InMemory
+final class InMemory implements Key
 {
-    private string $contents;
-    private string $passphrase;
+    private $contents;
+    private $passphrase;
 
     private function __construct(string $contents, string $passphrase)
     {
@@ -54,12 +55,12 @@ final class InMemory
         return new self($contents, $passphrase);
     }
 
-    public function contents(): string
+    public function getContent(): string
     {
         return $this->contents;
     }
 
-    public function passphrase(): string
+    public function getPassphrase(): string
     {
         return $this->passphrase;
     }

@@ -4,6 +4,8 @@ namespace Larke\JWT\Signer;
 
 use InvalidArgumentException;
 use Larke\JWT\Signer;
+use Larke\JWT\Contracts\Key;
+
 use function assert;
 use function is_array;
 use function is_resource;

@@ -2,6 +2,8 @@
 
 namespace Larke\JWT\Signer;
 
+use Larke\JWT\Contracts\Key;
+
 /**
  * Base class for hmac signers
  */

@@ -4,7 +4,7 @@ namespace Larke\JWT\Contracts;
 
 use InvalidArgumentException;
 
-use Larke\JWT\Signer\Key;
+use Larke\JWT\Contracts\Key;
 
 /**
  * Basic interface for token signers

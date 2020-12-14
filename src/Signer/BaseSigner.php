@@ -4,6 +4,7 @@ namespace Larke\JWT\Signer;
 
 use Larke\JWT\Signature;
 use Larke\JWT\Contracts\Signer;
+use Larke\JWT\Contracts\Key;
 
 /**
  * Base class for signers
