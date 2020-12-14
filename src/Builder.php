@@ -83,7 +83,7 @@ class Builder
     }
 
     /**
-     * Configures the expiration time
+     * Configures the expiration time, expirTime
      *
      * @param int $expiration
      * @param boolean $replicateAsHeader
@@ -96,7 +96,7 @@ class Builder
     }
 
     /**
-     * Configures the token id
+     * Configures the token id JwtId
      *
      * @param string $id
      * @param boolean $replicateAsHeader
