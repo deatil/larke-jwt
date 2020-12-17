@@ -5,8 +5,6 @@ namespace Larke\JWT\Exception;
 use JsonException;
 use RuntimeException;
 
-use Larke\JWT\Exception\Exception;
-
 final class CannotDecodeContent 
     extends RuntimeException 
     implements Exception

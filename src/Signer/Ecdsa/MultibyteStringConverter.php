@@ -12,6 +12,7 @@
 namespace Larke\JWT\Signer\Ecdsa;
 
 use InvalidArgumentException;
+
 use function bin2hex;
 use function dechex;
 use function hex2bin;
@@ -19,6 +20,7 @@ use function hexdec;
 use function mb_strlen;
 use function mb_substr;
 use function str_pad;
+
 use const STR_PAD_LEFT;
 
 /**

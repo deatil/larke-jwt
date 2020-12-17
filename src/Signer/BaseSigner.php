@@ -5,6 +5,7 @@ namespace Larke\JWT\Signer;
 use Larke\JWT\Signature;
 use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Contracts\Key;
+use Larke\JWT\Signer\Key\InMemory;
 
 /**
  * Base class for signers
@@ -43,7 +44,7 @@ abstract class BaseSigner implements Signer
     private function getKey($key)
     {
         if (is_string($key)) {
-            $key = new Key($key);
+            $key = InMemory::plainText($key);
         }
 
         return $key;

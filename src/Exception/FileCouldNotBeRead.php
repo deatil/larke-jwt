@@ -5,8 +5,6 @@ namespace Larke\JWT\Exception;
 use Throwable;
 use InvalidArgumentException;
 
-use Larke\JWT\Exception\Exception;
-
 final class FileCouldNotBeRead 
     extends InvalidArgumentException 
     implements Exception
