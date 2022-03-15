@@ -6,6 +6,7 @@ use SplFileObject;
 use Throwable;
 
 use Larke\JWT\Contracts\Key;
+use Larke\JWT\Exception\FileCouldNotBeRead;
 use Larke\JWT\Exception\CannotDecodeContent;
 
 final class InMemory implements Key
