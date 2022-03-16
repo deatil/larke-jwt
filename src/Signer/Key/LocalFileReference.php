@@ -5,12 +5,17 @@ namespace Larke\JWT\Signer\Key;
 use Larke\JWT\Contracts\Key;
 use Larke\JWT\Exception\FileCouldNotBeRead;
 
+use function strpos;
+use function substr;
+use function file_exists;
+
 final class LocalFileReference implements Key
 {
     private const PATH_PREFIX = 'file://';
 
     private $path;
     private $passphrase;
+    private string $contents;
 
     private function __construct(string $path, string $passphrase)
     {
@@ -36,7 +41,11 @@ final class LocalFileReference implements Key
 
     public function getContent(): string
     {
-        return self::PATH_PREFIX . $this->path;
+        if (empty($this->contents)) {
+            $this->contents = InMemory::file($this->path)->getContent();
+        }
+
+        return $this->contents;
     }
 
     public function getPassphrase(): string

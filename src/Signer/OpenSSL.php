@@ -2,9 +2,9 @@
 
 namespace Larke\JWT\Signer;
 
-use InvalidArgumentException;
 use Larke\JWT\Signer;
 use Larke\JWT\Contracts\Key;
+use Larke\JWT\Exception\InvalidKeyProvided;
 
 use function assert;
 use function is_array;
@@ -27,9 +27,7 @@ abstract class OpenSSL extends BaseSigner
             $signature = '';
 
             if (! openssl_sign($payload, $signature, $privateKey, $this->getAlgorithm())) {
-                throw new InvalidArgumentException(
-                    'There was an error while creating the signature: ' . openssl_error_string()
-                );
+                throw InvalidKeyProvided::creatingSignatureError(openssl_error_string());
             }
 
             return $signature;
@@ -89,16 +87,14 @@ abstract class OpenSSL extends BaseSigner
      */
     private function validateKey($key)
     {
-        if (! is_resource($key)) {
-            throw new InvalidArgumentException(
-                'It was not possible to parse your key, reason: ' . openssl_error_string()
-            );
+        if (is_bool($key)) {
+            throw InvalidKeyProvided::cannotBeParsed(openssl_error_string());
         }
 
         $details = openssl_pkey_get_details($key);
 
         if (! isset($details['key']) || $details['type'] !== $this->getKeyType()) {
-            throw new InvalidArgumentException('This key is not compatible with this signer');
+            throw InvalidKeyProvided::incompatibleKey();
         }
     }
 
