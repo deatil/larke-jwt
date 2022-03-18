@@ -1,6 +1,6 @@
 <?php
 
-namespace Larke\JWT;
+namespace Larke\JWT\Parsing;
 
 use SodiumException;
 
