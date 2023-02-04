@@ -7,7 +7,7 @@ use Larke\JWT\Signer\Hmac;
 /**
  * Signer for HMAC SHA-512
  */
-class Sha512 extends Hmac
+final class Sha512 extends Hmac
 {
     /**
      * {@inheritdoc}

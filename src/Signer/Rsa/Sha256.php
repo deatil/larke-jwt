@@ -7,7 +7,7 @@ use Larke\JWT\Signer\Rsa;
 /**
  * Signer for RSA SHA-256
  */
-class Sha256 extends Rsa
+final class Sha256 extends Rsa
 {
     /**
      * {@inheritdoc}

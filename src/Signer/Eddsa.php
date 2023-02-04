@@ -13,7 +13,7 @@ use function sodium_crypto_sign_verify_detached;
 /**
  * EDDSA signers
  */
-class Eddsa extends BaseSigner
+final class Eddsa extends BaseSigner
 {
     public function getAlgorithmId()
     {

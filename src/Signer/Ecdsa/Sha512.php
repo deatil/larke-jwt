@@ -7,7 +7,7 @@ use Larke\JWT\Signer\Ecdsa;
 /**
  * Signer for ECDSA SHA-512
  */
-class Sha512 extends Ecdsa
+final class Sha512 extends Ecdsa
 {
     /**
      * {@inheritdoc}
