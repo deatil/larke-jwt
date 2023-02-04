@@ -15,6 +15,8 @@ use function sodium_crypto_sign_verify_detached;
  */
 final class Eddsa extends BaseSigner
 {
+    private const SIGN_SECRETKEYBYTES_KEY_LENGTH = SODIUM_CRYPTO_SIGN_SECRETKEYBYTES;
+    
     public function getAlgorithmId()
     {
         return 'EdDSA';
