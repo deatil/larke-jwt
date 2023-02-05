@@ -3,7 +3,8 @@
 namespace Larke\JWT;
 
 use InvalidArgumentException;
-use Larke\JWT\Parsing\Decoder;
+use Larke\JWT\Contracts\Decoder;
+use Larke\JWT\Encoding\JoseEncoder;
 use Larke\JWT\Claim\Factory as ClaimFactory;
 
 /**
@@ -35,7 +36,7 @@ class Parser
         Decoder $decoder = null,
         ClaimFactory $claimFactory = null
     ) {
-        $this->decoder = $decoder ?: new Decoder();
+        $this->decoder = $decoder ?: new JoseEncoder();
         $this->claimFactory = $claimFactory ?: new ClaimFactory();
     }
 

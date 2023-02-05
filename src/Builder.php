@@ -2,10 +2,11 @@
 
 namespace Larke\JWT;
 
-use Larke\JWT\Claim\Factory as ClaimFactory;
-use Larke\JWT\Parsing\Encoder;
 use Larke\JWT\Contracts\Signer;
+use Larke\JWT\Contracts\Encoder;
 use Larke\JWT\Contracts\Key;
+use Larke\JWT\Encoding\JoseEncoder;
+use Larke\JWT\Claim\Factory as ClaimFactory;
 
 use function implode;
 
@@ -20,7 +21,7 @@ class Builder
      * @var array
      */
     private $headers = [
-        'typ'=> 'JWT', 
+        'typ' => 'JWT', 
         'alg' => 'none'
     ];
 
@@ -65,7 +66,7 @@ class Builder
         Encoder $encoder = null,
         ClaimFactory $claimFactory = null
     ) {
-        $this->encoder = $encoder ?: new Encoder();
+        $this->encoder = $encoder ?: new JoseEncoder();
         $this->claimFactory = $claimFactory ?: new ClaimFactory();
     }
 

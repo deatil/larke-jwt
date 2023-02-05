@@ -1,23 +1,20 @@
 <?php
 
-namespace Larke\JWT\Parsing;
+namespace Larke\JWT\Encoding;
 
 use SodiumException;
-
 use Larke\JWT\Exception\CannotDecodeContent;
 
-use function rtrim;
-use function strtr;
-use function is_string;
 use function base64_decode;
 use function base64_encode;
 use function function_exists;
+use function is_string;
+use function rtrim;
 use function sodium_base642bin;
 use function sodium_bin2base64;
+use function strtr;
 
-/** 
- * Base64 实现
- */
+/** @internal */
 final class SodiumBase64Polyfill
 {
     public const SODIUM_BASE64_VARIANT_ORIGINAL            = 1;
@@ -25,6 +22,7 @@ final class SodiumBase64Polyfill
     public const SODIUM_BASE64_VARIANT_URLSAFE             = 5;
     public const SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING  = 7;
 
+    /** @return ($decoded is non-empty-string ? non-empty-string : string) */
     public static function bin2base64(string $decoded, int $variant): string
     {
         if (! function_exists('sodium_bin2base64')) {
@@ -34,6 +32,7 @@ final class SodiumBase64Polyfill
         return sodium_bin2base64($decoded, $variant);
     }
 
+    /** @return ($decoded is non-empty-string ? non-empty-string : string) */
     public static function bin2base64Fallback(string $decoded, int $variant): string
     {
         $encoded = base64_encode($decoded);
@@ -55,8 +54,10 @@ final class SodiumBase64Polyfill
         return $encoded;
     }
 
-    /** 
-     * @throws CannotDecodeContent 
+    /**
+     * @return ($encoded is non-empty-string ? non-empty-string : string)
+     *
+     * @throws CannotDecodeContent
      */
     public static function base642bin(string $encoded, int $variant): string
     {
@@ -66,13 +67,15 @@ final class SodiumBase64Polyfill
 
         try {
             return sodium_base642bin($encoded, $variant, '');
-        } catch (SodiumException $sodiumException) {
+        } catch (SodiumException) {
             throw CannotDecodeContent::invalidBase64String();
         }
     }
 
-    /** 
-     * @throws CannotDecodeContent 
+    /**
+     * @return ($encoded is non-empty-string ? non-empty-string : string)
+     *
+     * @throws CannotDecodeContent
      */
     public static function base642binFallback(string $encoded, int $variant): string
     {
