@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Larke\JWT\Signer\Hmac;
 
 use Larke\JWT\Signer\Hmac;

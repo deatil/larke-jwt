@@ -1,9 +1,11 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Larke\JWT\Signer\Key;
 
-use SplFileObject;
 use Throwable;
+use SplFileObject;
 
 use Larke\JWT\Contracts\Key;
 use Larke\JWT\Exception\FileCouldNotBeRead;

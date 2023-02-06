@@ -1,10 +1,12 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Larke\JWT\Signer;
 
+use Larke\JWT\Contracts\Key;
 use Larke\JWT\Signer\Ecdsa\MultibyteStringConverter;
 use Larke\JWT\Signer\Ecdsa\SignatureConverter;
-use Larke\JWT\Contracts\Key;
 
 use const OPENSSL_KEYTYPE_EC;
 

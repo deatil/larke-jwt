@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Larke\JWT;
 
 use Larke\JWT\Contracts\Signer;
@@ -31,8 +33,8 @@ class Signature
      * Verifies if the current hash matches with with the result of the creation of
      * a new signature with given data
      *
-     * @param Signer $signer
-     * @param string $payload
+     * @param Signer     $signer
+     * @param string     $payload
      * @param Key|string $key
      *
      * @return boolean

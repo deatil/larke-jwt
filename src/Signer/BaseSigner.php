@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Larke\JWT\Signer;
 
 use Larke\JWT\Signature;

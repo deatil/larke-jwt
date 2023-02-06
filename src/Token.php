@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Larke\JWT;
 
 use OutOfBoundsException;
@@ -49,9 +51,9 @@ class Token
     /**
      * Initializes the object
      *
-     * @param array $headers
-     * @param array $claims
-     * @param array $payload
+     * @param array     $headers
+     * @param array     $claims
+     * @param array     $payload
      * @param Signature $signature
      */
     public function __construct(
@@ -92,7 +94,7 @@ class Token
      * Returns the value of a token header
      *
      * @param string $name
-     * @param mixed $default
+     * @param mixed  $default
      *
      * @return mixed
      *
@@ -155,7 +157,7 @@ class Token
      * Returns the value of a token claim
      *
      * @param string $name
-     * @param mixed $default
+     * @param mixed  $default
      *
      * @return mixed
      *
@@ -177,7 +179,7 @@ class Token
     /**
      * Verify if the key matches with the one that created the signature
      *
-     * @param Signer $signer
+     * @param Signer     $signer
      * @param Key|string $key
      *
      * @return boolean
@@ -207,7 +209,7 @@ class Token
     public function validate(ValidationData $data)
     {
         foreach ($this->getValidatableClaims() as $claim) {
-            if (!$claim->validate($data)) {
+            if (! $claim->validate($data)) {
                 return false;
             }
         }

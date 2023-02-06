@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Larke\JWT;
 
 use Larke\JWT\Contracts\Signer;
@@ -74,7 +76,7 @@ class Builder
      * Configures the audience
      *
      * @param string $audience
-     * @param bool $replicateAsHeader
+     * @param bool   $replicateAsHeader
      *
      * @return Builder
      */
@@ -86,7 +88,7 @@ class Builder
     /**
      * Configures the expiration time, expirTime
      *
-     * @param int $expiration
+     * @param int     $expiration
      * @param boolean $replicateAsHeader
      *
      * @return Builder
@@ -99,7 +101,7 @@ class Builder
     /**
      * Configures the token id JwtId
      *
-     * @param string $id
+     * @param string  $id
      * @param boolean $replicateAsHeader
      *
      * @return Builder
@@ -112,7 +114,7 @@ class Builder
     /**
      * Configures the time that the token was issued
      *
-     * @param int $issuedAt
+     * @param int     $issuedAt
      * @param boolean $replicateAsHeader
      *
      * @return Builder
@@ -125,7 +127,7 @@ class Builder
     /**
      * Configures the issuer
      *
-     * @param string $issuer
+     * @param string  $issuer
      * @param boolean $replicateAsHeader
      *
      * @return Builder
@@ -138,7 +140,7 @@ class Builder
     /**
      * Configures the time before which the token cannot be accepted
      *
-     * @param int $notBefore
+     * @param int     $notBefore
      * @param boolean $replicateAsHeader
      *
      * @return Builder
@@ -151,7 +153,7 @@ class Builder
     /**
      * Configures the subject
      *
-     * @param string $subject
+     * @param string  $subject
      * @param boolean $replicateAsHeader
      *
      * @return Builder
@@ -164,8 +166,8 @@ class Builder
     /**
      * Configures a registered claim
      *
-     * @param string $name
-     * @param mixed $value
+     * @param string  $name
+     * @param mixed   $value
      * @param boolean $replicate
      *
      * @return Builder
@@ -185,7 +187,7 @@ class Builder
      * Configures a header item
      *
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return Builder
      */
@@ -200,7 +202,7 @@ class Builder
      * Configures a claim item
      *
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return Builder
      */
@@ -233,7 +235,7 @@ class Builder
         $signature = $this->createSignature($payload, $signer, $key);
 
         if ($signature !== null) {
-            $payload[] = $this->encoder->base64UrlEncode($signature);
+            $payload[] = $this->encoder->base64UrlEncode((string) $signature);
         }
 
         return new Token($this->headers, $this->claims, $signature, $payload);

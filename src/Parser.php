@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Larke\JWT;
 
 use InvalidArgumentException;
@@ -29,7 +31,7 @@ class Parser
     /**
      * Initializes the object
      *
-     * @param Decoder $decoder
+     * @param Decoder      $decoder
      * @param ClaimFactory $claimFactory
      */
     public function __construct(
@@ -132,7 +134,7 @@ class Parser
     /**
      * Returns the signature from given data
      *
-     * @param array $header
+     * @param array  $header
      * @param string $data
      *
      * @return Signature
