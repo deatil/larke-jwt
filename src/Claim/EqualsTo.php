@@ -5,6 +5,7 @@ declare (strict_types = 1);
 namespace Larke\JWT\Claim;
 
 use Larke\JWT\Contracts\Claim;
+use Larke\JWT\Contracts\Validatable;
 use Larke\JWT\ValidationData;
 
 /**

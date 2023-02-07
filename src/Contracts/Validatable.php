@@ -2,7 +2,7 @@
 
 declare (strict_types = 1);
 
-namespace Larke\JWT\Claim;
+namespace Larke\JWT\Contracts;
 
 use Larke\JWT\ValidationData;
 

@@ -16,7 +16,7 @@ composer require lake/larke-jwt
 
 ### Dependencies
 
-- PHP 5.6+
+- PHP 8.0.2+
 - OpenSSL Extension
 
 ## Basic usage

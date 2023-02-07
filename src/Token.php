@@ -4,16 +4,17 @@ declare (strict_types = 1);
 
 namespace Larke\JWT;
 
-use OutOfBoundsException;
-use BadMethodCallException;
 use DateTime;
 use DateTimeInterface;
 use Generator;
+use OutOfBoundsException;
+use BadMethodCallException;
 
-use Larke\JWT\Contracts\Claim;
-use Larke\JWT\Claim\Validatable;
-use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Contracts\Key;
+use Larke\JWT\Contracts\Claim;
+use Larke\JWT\Contracts\Signer;
+use Larke\JWT\Contracts\Validatable;
+use Larke\JWT\Claim\RegisteredClaims;
 
 /**
  * Basic structure of the JWT
@@ -62,10 +63,10 @@ class Token
         Signature $signature = null,
         array $payload = ['', '']
     ) {
-        $this->headers = $headers;
-        $this->claims = $claims;
+        $this->headers   = $headers;
+        $this->claims    = $claims;
         $this->signature = $signature;
-        $this->payload = $payload;
+        $this->payload   = $payload;
     }
 
     /**
@@ -226,7 +227,7 @@ class Token
      */
     public function isExpired(DateTimeInterface $now = null)
     {
-        $exp = $this->getClaim('exp', false);
+        $exp = $this->getClaim(RegisteredClaims::EXPIRATION_TIME, false);
 
         if ($exp === false) {
             return false;

@@ -16,7 +16,7 @@ class Factory
      *
      * @var array
      */
-    private $callbacks;
+    private $callbacks = [];
 
     /**
      * Initializes the factory, registering the default callbacks
@@ -27,13 +27,13 @@ class Factory
     {
         $this->callbacks = array_merge(
             [
-                'iat' => [$this, 'createLesserOrEqualsTo'],
-                'nbf' => [$this, 'createLesserOrEqualsTo'],
-                'exp' => [$this, 'createGreaterOrEqualsTo'],
-                'iss' => [$this, 'createEqualsTo'],
-                'aud' => [$this, 'createEqualsTo'],
-                'sub' => [$this, 'createEqualsTo'],
-                'jti' => [$this, 'createEqualsTo']
+                RegisteredClaims::ISSUED_AT       => [$this, 'createLesserOrEqualsTo'],
+                RegisteredClaims::NOT_BEFORE      => [$this, 'createLesserOrEqualsTo'],
+                RegisteredClaims::EXPIRATION_TIME => [$this, 'createGreaterOrEqualsTo'],
+                RegisteredClaims::ISSUER          => [$this, 'createEqualsTo'],
+                RegisteredClaims::AUDIENCE        => [$this, 'createEqualsTo'],
+                RegisteredClaims::SUBJECT         => [$this, 'createEqualsTo'],
+                RegisteredClaims::ID              => [$this, 'createEqualsTo']
             ],
             $callbacks
         );

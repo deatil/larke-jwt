@@ -29,7 +29,7 @@ class Basic implements Claim
      */
     public function __construct($name, $value)
     {
-        $this->name = $name;
+        $this->name  = $name;
         $this->value = $value;
     }
 

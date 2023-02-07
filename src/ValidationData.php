@@ -4,6 +4,8 @@ declare (strict_types = 1);
 
 namespace Larke\JWT;
 
+use Larke\JWT\Claim\RegisteredClaims;
+
 /**
  * Class that wraps validation values
  */
@@ -34,10 +36,10 @@ class ValidationData
         $this->leeway = (int) $leeway;
 
         $this->items = [
-            'jti' => null,
-            'iss' => null,
-            'aud' => null,
-            'sub' => null
+            RegisteredClaims::ID       => null,
+            RegisteredClaims::ISSUER   => null,
+            RegisteredClaims::AUDIENCE => null,
+            RegisteredClaims::SUBJECT  => null
         ];
 
         $this->currentTime($currentTime);
@@ -50,7 +52,7 @@ class ValidationData
      */
     public function identifiedBy($id)
     {
-        $this->items['jti'] = (string) $id;
+        $this->items[RegisteredClaims::ID] = (string) $id;
     }
 
     /**
@@ -60,7 +62,7 @@ class ValidationData
      */
     public function issuedBy($issuer)
     {
-        $this->items['iss'] = (string) $issuer;
+        $this->items[RegisteredClaims::ISSUER] = (string) $issuer;
     }
 
     /**
@@ -70,7 +72,7 @@ class ValidationData
      */
     public function permittedFor($audience)
     {
-        $this->items['aud'] = (string) $audience;
+        $this->items[RegisteredClaims::AUDIENCE] = (string) $audience;
     }
 
     /**
@@ -80,7 +82,7 @@ class ValidationData
      */
     public function relatedTo($subject)
     {
-        $this->items['sub'] = (string) $subject;
+        $this->items[RegisteredClaims::SUBJECT] = (string) $subject;
     }
 
     /**
@@ -92,9 +94,9 @@ class ValidationData
     {
         $currentTime  = (int) $currentTime;
 
-        $this->items['iat'] = $currentTime + $this->leeway;
-        $this->items['nbf'] = $currentTime + $this->leeway;
-        $this->items['exp'] = $currentTime - $this->leeway;
+        $this->items[RegisteredClaims::ISSUED_AT]       = $currentTime + $this->leeway;
+        $this->items[RegisteredClaims::NOT_BEFORE]      = $currentTime + $this->leeway;
+        $this->items[RegisteredClaims::EXPIRATION_TIME] = $currentTime - $this->leeway;
     }
 
     /**

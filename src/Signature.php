@@ -4,8 +4,8 @@ declare (strict_types = 1);
 
 namespace Larke\JWT;
 
-use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Contracts\Key;
+use Larke\JWT\Contracts\Signer;
 
 /**
  * This class represents a token signature

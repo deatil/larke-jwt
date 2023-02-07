@@ -4,11 +4,12 @@ declare (strict_types = 1);
 
 namespace Larke\JWT;
 
+use Larke\JWT\Contracts\Key;
 use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Contracts\Encoder;
-use Larke\JWT\Contracts\Key;
 use Larke\JWT\Encoding\JoseEncoder;
 use Larke\JWT\Claim\Factory as ClaimFactory;
+use Larke\JWT\Claim\RegisteredClaims;
 
 use function implode;
 
@@ -65,10 +66,10 @@ class Builder
      * @param ClaimFactory $claimFactory
      */
     public function __construct(
-        Encoder $encoder = null,
+        Encoder      $encoder = null,
         ClaimFactory $claimFactory = null
     ) {
-        $this->encoder = $encoder ?: new JoseEncoder();
+        $this->encoder      = $encoder ?: new JoseEncoder();
         $this->claimFactory = $claimFactory ?: new ClaimFactory();
     }
 
@@ -82,7 +83,7 @@ class Builder
      */
     public function permittedFor($audience, $replicateAsHeader = false)
     {
-        return $this->withRegisteredClaim('aud', (string) $audience, $replicateAsHeader);
+        return $this->withRegisteredClaim(RegisteredClaims::AUDIENCE, (string) $audience, $replicateAsHeader);
     }
 
     /**
@@ -95,7 +96,7 @@ class Builder
      */
     public function expiresAt($expiration, $replicateAsHeader = false)
     {
-        return $this->withRegisteredClaim('exp', (int) $expiration, $replicateAsHeader);
+        return $this->withRegisteredClaim(RegisteredClaims::EXPIRATION_TIME, (int) $expiration, $replicateAsHeader);
     }
 
     /**
@@ -108,7 +109,7 @@ class Builder
      */
     public function identifiedBy($id, $replicateAsHeader = false)
     {
-        return $this->withRegisteredClaim('jti', (string) $id, $replicateAsHeader);
+        return $this->withRegisteredClaim(RegisteredClaims::ID, (string) $id, $replicateAsHeader);
     }
 
     /**
@@ -121,7 +122,7 @@ class Builder
      */
     public function issuedAt($issuedAt, $replicateAsHeader = false)
     {
-        return $this->withRegisteredClaim('iat', (int) $issuedAt, $replicateAsHeader);
+        return $this->withRegisteredClaim(RegisteredClaims::ISSUED_AT, (int) $issuedAt, $replicateAsHeader);
     }
 
     /**
@@ -134,7 +135,7 @@ class Builder
      */
     public function issuedBy($issuer, $replicateAsHeader = false)
     {
-        return $this->withRegisteredClaim('iss', (string) $issuer, $replicateAsHeader);
+        return $this->withRegisteredClaim(RegisteredClaims::ISSUER, (string) $issuer, $replicateAsHeader);
     }
 
     /**
@@ -147,7 +148,7 @@ class Builder
      */
     public function canOnlyBeUsedAfter($notBefore, $replicateAsHeader = false)
     {
-        return $this->withRegisteredClaim('nbf', (int) $notBefore, $replicateAsHeader);
+        return $this->withRegisteredClaim(RegisteredClaims::NOT_BEFORE, (int) $notBefore, $replicateAsHeader);
     }
 
     /**
@@ -160,7 +161,7 @@ class Builder
      */
     public function relatedTo($subject, $replicateAsHeader = false)
     {
-        return $this->withRegisteredClaim('sub', (string) $subject, $replicateAsHeader);
+        return $this->withRegisteredClaim(RegisteredClaims::SUBJECT, (string) $subject, $replicateAsHeader);
     }
 
     /**
@@ -212,6 +213,20 @@ class Builder
 
         return $this;
     }
+    
+    /**
+     * Returns the encoded data
+     *
+     * @param array $data
+     *
+     * @return string
+     */
+    private function encode(array $data)
+    {
+        return $this->encoder->base64UrlEncode(
+            $this->encoder->jsonEncode($data)
+        );
+    }
 
     /**
      * Returns the resultant token
@@ -228,8 +243,8 @@ class Builder
         }
 
         $payload = [
-            $this->encoder->base64UrlEncode($this->encoder->jsonEncode($this->headers)),
-            $this->encoder->base64UrlEncode($this->encoder->jsonEncode($this->claims))
+            $this->encode($this->headers),
+            $this->encode($this->claims)
         ];
 
         $signature = $this->createSignature($payload, $signer, $key);
