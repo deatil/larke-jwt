@@ -10,6 +10,7 @@ use Larke\JWT\Contracts\Encoder;
 use Larke\JWT\Encoding\JoseEncoder;
 use Larke\JWT\Claim\Factory as ClaimFactory;
 use Larke\JWT\Claim\RegisteredClaims;
+use Larke\JWT\Format\ChainedFormatter;
 
 use function implode;
 
@@ -50,6 +51,13 @@ class Builder
     private $claimFactory;
 
     /**
+     * The formatter of claims
+     *
+     * @var ClaimsFormatter
+     */
+    private $claimFormatter;
+
+    /**
      * @var Signer|null
      */
     private $signer;
@@ -66,11 +74,13 @@ class Builder
      * @param ClaimFactory $claimFactory
      */
     public function __construct(
-        Encoder      $encoder = null,
-        ClaimFactory $claimFactory = null
+        Encoder         $encoder = null,
+        ClaimFactory    $claimFactory = null,
+        ClaimsFormatter $claimFormatter = null
     ) {
-        $this->encoder      = $encoder ?: new JoseEncoder();
-        $this->claimFactory = $claimFactory ?: new ClaimFactory();
+        $this->encoder        = $encoder ?: new JoseEncoder();
+        $this->claimFactory   = $claimFactory ?: new ClaimFactory();
+        $this->claimFormatter = $claimFormatter ?: ChainedFormatter::withUnixTimestampDates();
     }
 
     /**
@@ -96,7 +106,7 @@ class Builder
      */
     public function expiresAt($expiration, $replicateAsHeader = false)
     {
-        return $this->withRegisteredClaim(RegisteredClaims::EXPIRATION_TIME, (int) $expiration, $replicateAsHeader);
+        return $this->withRegisteredClaim(RegisteredClaims::EXPIRATION_TIME, $expiration, $replicateAsHeader);
     }
 
     /**
@@ -122,7 +132,7 @@ class Builder
      */
     public function issuedAt($issuedAt, $replicateAsHeader = false)
     {
-        return $this->withRegisteredClaim(RegisteredClaims::ISSUED_AT, (int) $issuedAt, $replicateAsHeader);
+        return $this->withRegisteredClaim(RegisteredClaims::ISSUED_AT, $issuedAt, $replicateAsHeader);
     }
 
     /**
@@ -148,7 +158,7 @@ class Builder
      */
     public function canOnlyBeUsedAfter($notBefore, $replicateAsHeader = false)
     {
-        return $this->withRegisteredClaim(RegisteredClaims::NOT_BEFORE, (int) $notBefore, $replicateAsHeader);
+        return $this->withRegisteredClaim(RegisteredClaims::NOT_BEFORE, $notBefore, $replicateAsHeader);
     }
 
     /**
@@ -241,10 +251,12 @@ class Builder
         if ($signer instanceof Signer) {
             $signer->modifyHeader($this->headers);
         }
+        
+        $formatedClaims = $this->claimFormatter->formatClaims($this->claims);
 
         $payload = [
             $this->encode($this->headers),
-            $this->encode($this->claims)
+            $this->encode($formatedClaims)
         ];
 
         $signature = $this->createSignature($payload, $signer, $key);
