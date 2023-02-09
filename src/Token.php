@@ -170,12 +170,12 @@ class Token
     /**
      * Verify if the key matches with the one that created the signature
      *
-     * @param Signer     $signer
-     * @param Key|string $key
+     * @param Signer $signer
+     * @param Key    $key
      *
      * @return boolean
      */
-    public function verify(Signer $signer, $key): bool
+    public function verify(Signer $signer, Key $key): bool
     {
         if ($this->headers->get(RegisteredHeaders::ALGORITHM) !== $signer->getAlgorithmId()) {
             return false;

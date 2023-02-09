@@ -29,24 +29,24 @@ interface Signer
      * Returns a signature for given data
      *
      * @param string $payload
-     * @param Key|string $key
+     * @param Key    $key
      *
      * @return string
      *
      * @throws InvalidArgumentException When given key is invalid
      */
-    public function sign(string $payload, mixed $key): string;
+    public function sign(string $payload, Key $key): string;
 
     /**
      * Returns if the expected hash matches with the data and key
      *
      * @param string $expected
      * @param string $payload
-     * @param Key|string $key
+     * @param Key    $key
      *
      * @return boolean
      *
      * @throws InvalidArgumentException When given key is invalid
      */
-    public function verify(string $expected, string $payload, mixed $key): bool;
+    public function verify(string $expected, string $payload, Key $key): bool;
 }

@@ -27,31 +27,17 @@ abstract class BaseSigner implements Signer
     /**
      * {@inheritdoc}
      */
-    public function sign(string $payload, mixed $key): string
+    public function sign(string $payload, Key $key): string
     {
-        return $this->createHash($payload, $this->getKey($key));
+        return $this->createHash($payload, $key);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function verify(string $expected, string $payload, mixed $key): bool
+    public function verify(string $expected, string $payload, Key $key): bool
     {
-        return $this->doVerify($expected, $payload, $this->getKey($key));
-    }
-
-    /**
-     * @param Key|string $key
-     *
-     * @return Key
-     */
-    private function getKey(mixed $key): Key
-    {
-        if (is_string($key)) {
-            $key = InMemory::plainText($key);
-        }
-
-        return $key;
+        return $this->doVerify($expected, $payload, $key);
     }
 
     /**
@@ -60,7 +46,7 @@ abstract class BaseSigner implements Signer
      * @internal
      *
      * @param string $payload
-     * @param Key $key
+     * @param Key    $key
      *
      * @return string
      */
@@ -73,7 +59,7 @@ abstract class BaseSigner implements Signer
      *
      * @param string $expected
      * @param string $payload
-     * @param Key $key
+     * @param Key    $key
      *
      * @return boolean
      */

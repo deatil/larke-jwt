@@ -110,7 +110,7 @@ class Parser
      *
      * @throws InvalidArgumentException When an invalid header is informed
      */
-    protected function parseHeader(string  $data): array
+    protected function parseHeader(string $data): array
     {
         $header = $this->decoder->jsonDecode($this->decoder->base64UrlDecode($data));
 
