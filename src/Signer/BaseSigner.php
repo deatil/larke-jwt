@@ -4,10 +4,10 @@ declare (strict_types = 1);
 
 namespace Larke\JWT\Signer;
 
-use Larke\JWT\Signature;
 use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Contracts\Key;
 use Larke\JWT\Signer\Key\InMemory;
+use Larke\JWT\Claim\RegisteredHeaders;
 
 use function is_string;
 
@@ -21,15 +21,15 @@ abstract class BaseSigner implements Signer
      */
     public function modifyHeader(array &$headers)
     {
-        $headers['alg'] = $this->getAlgorithmId();
+        $headers[RegisteredHeaders::ALGORITHM] = $this->getAlgorithmId();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function sign(string $payload, mixed $key): Signature
+    public function sign(string $payload, mixed $key): string
     {
-        return new Signature($this->createHash($payload, $this->getKey($key)));
+        return $this->createHash($payload, $this->getKey($key));
     }
 
     /**

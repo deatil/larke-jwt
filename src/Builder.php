@@ -12,6 +12,7 @@ use Larke\JWT\Contracts\Encoder;
 use Larke\JWT\Encoding\JoseEncoder;
 use Larke\JWT\Claim\Factory as ClaimFactory;
 use Larke\JWT\Claim\RegisteredClaims;
+use Larke\JWT\Claim\RegisteredHeaders;
 use Larke\JWT\Format\ChainedFormatter;
 
 use function implode;
@@ -27,8 +28,8 @@ class Builder
      * @var array
      */
     private $headers = [
-        'typ' => 'JWT', 
-        'alg' => 'none'
+        RegisteredHeaders::TYPE      => 'JWT', 
+        RegisteredHeaders::ALGORITHM => 'none'
     ];
 
     /**
@@ -58,16 +59,6 @@ class Builder
      * @var ClaimsFormatter
      */
     private $claimFormatter;
-
-    /**
-     * @var Signer|null
-     */
-    private $signer;
-
-    /**
-     * @var Key|null
-     */
-    private $key;
 
     /**
      * Initializes a new builder
@@ -245,42 +236,20 @@ class Builder
      *
      * @return Token
      */
-    public function getToken(Signer $signer = null, Key $key = null): Token
+    public function getToken(Signer $signer, Key $key): Token
     {
-        $signer = $signer ?: $this->signer;
-        $key = $key ?: $this->key;
-
-        if ($signer instanceof Signer) {
-            $signer->modifyHeader($this->headers);
-        }
+        $signer->modifyHeader($this->headers);
         
-        $formatedClaims = $this->claimFormatter->formatClaims($this->claims);
+        $encodedHeaders = $this->encode($this->headers);
+        $encodedClaims  = $this->encode($this->claimFormatter->formatClaims($this->claims));
+        
+        $signature        = $signer->sign($encodedHeaders . '.' . $encodedClaims, $key);
+        $encodedSignature = $this->encoder->base64UrlEncode($signature);
 
-        $payload = [
-            $this->encode($this->headers),
-            $this->encode($formatedClaims)
-        ];
-
-        $signature = $this->createSignature($payload, $signer, $key);
-
-        if ($signature !== null) {
-            $payload[] = $this->encoder->base64UrlEncode((string) $signature);
-        }
-
-        return new Token($this->headers, $this->claims, $signature, $payload);
-    }
-
-    /**
-     * @param string[] $payload
-     *
-     * @return Signature|null
-     */
-    private function createSignature(array $payload, Signer $signer = null, Key $key = null): mixed
-    {
-        if ($signer === null || $key === null) {
-            return null;
-        }
-
-        return $signer->sign(implode('.', $payload), $key);
+        return new Token(
+            new DataSet($this->headers, $encodedHeaders),
+            new DataSet($this->claims, $encodedClaims),
+            new Signature($signature, $encodedSignature)
+        );
     }
 }

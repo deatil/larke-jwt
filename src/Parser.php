@@ -10,12 +10,14 @@ use InvalidArgumentException;
 use Larke\JWT\Contracts\Decoder;
 use Larke\JWT\Encoding\JoseEncoder;
 use Larke\JWT\Claim\RegisteredClaims;
+use Larke\JWT\Claim\RegisteredHeaders;
 use Larke\JWT\Claim\Factory as ClaimFactory;
 use Larke\JWT\Exception\InvalidTokenStructure;
 
 use function explode;
 use function in_array;
 use function is_numeric;
+use function array_key_exists;
 
 /**
  * This class parses the JWT strings and convert them into tokens
@@ -61,10 +63,10 @@ class Parser
      */
     public function parse($jwt): Token
     {
-        $data      = $this->splitJwt($jwt);
-        $header    = $this->parseHeader($data[0]);
-        $claims    = $this->parseClaims($data[1]);
-        $signature = $this->parseSignature($header, $data[2]);
+        [$encodedHeaders, $encodedClaims, $encodedSignature] = $this->splitJwt($jwt);
+        
+        $header = $this->parseHeader($encodedHeaders);
+        $claims = $this->parseClaims($encodedClaims);
 
         foreach ($claims as $name => $value) {
             if (isset($header[$name])) {
@@ -72,11 +74,11 @@ class Parser
             }
         }
 
-        if ($signature === null) {
-            unset($data[2]);
-        }
-
-        return new Token($header, $claims, $signature, $data);
+        return new Token(
+            new DataSet($header, $encodedHeaders),
+            new DataSet($claims, $encodedClaims),
+            $this->parseSignature($encodedSignature)
+        );
     }
 
     /**
@@ -93,7 +95,7 @@ class Parser
         $data = explode('.', $jwt);
 
         if (count($data) != 3) {
-            throw new InvalidArgumentException('The JWT string must have two dots');
+            throw InvalidTokenStructure::missingOrNotEnoughSeparators();
         }
 
         return $data;
@@ -110,10 +112,20 @@ class Parser
      */
     protected function parseHeader(string  $data): array
     {
-        $header = (array) $this->decoder->jsonDecode($this->decoder->base64UrlDecode($data));
+        $header = $this->decoder->jsonDecode($this->decoder->base64UrlDecode($data));
 
-        if (isset($header['enc'])) {
+        if (! is_array($header)) {
+            throw InvalidTokenStructure::arrayExpected('headers');
+        }
+
+        $this->guardAgainstEmptyStringKeys($header, 'headers');
+
+        if (isset($header[RegisteredHeaders::ENCRYPTION])) {
             throw new InvalidArgumentException('Encryption is not supported yet');
+        }
+        
+        if (! array_key_exists(RegisteredHeaders::TYPE, $header)) {
+            $header[RegisteredHeaders::TYPE] = 'JWT';
         }
 
         return $header;
@@ -128,7 +140,13 @@ class Parser
      */
     protected function parseClaims(string $data): array
     {
-        $claims = (array) $this->decoder->jsonDecode($this->decoder->base64UrlDecode($data));
+        $claims = $this->decoder->jsonDecode($this->decoder->base64UrlDecode($data));
+
+        if (! is_array($claims)) {
+            throw InvalidTokenStructure::arrayExpected('claims');
+        }
+
+        $this->guardAgainstEmptyStringKeys($claims, 'claims');
 
         foreach ($claims as $name => &$value) {
             if (in_array($name, RegisteredClaims::DATE_CLAIMS)) {
@@ -141,6 +159,21 @@ class Parser
         return $claims;
     }
 
+    /**
+     * @param array<string, mixed> $array
+     * @param non-empty-string     $part
+     *
+     * @phpstan-assert array<non-empty-string, mixed> $array
+     */
+    private function guardAgainstEmptyStringKeys(array $array, string $part): void
+    {
+        foreach ($array as $key => $value) {
+            if ($key === '') {
+                throw InvalidTokenStructure::arrayExpected($part);
+            }
+        }
+    }
+    
     /** @throws InvalidTokenStructure */
     private function convertDate(int|float|string $timestamp): DateTimeImmutable
     {
@@ -162,19 +195,14 @@ class Parser
     /**
      * Returns the signature from given data
      *
-     * @param array  $header
      * @param string $data
      *
      * @return Signature
      */
-    protected function parseSignature(array $header, string $data): Signature
+    protected function parseSignature(string $data): Signature
     {
-        if (empty($data) || !isset($header['alg']) || $header['alg'] == 'none') {
-            return null;
-        }
-
         $hash = $this->decoder->base64UrlDecode($data);
 
-        return new Signature($hash);
+        return new Signature($hash, $data);
     }
 }

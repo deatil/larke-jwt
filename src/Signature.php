@@ -20,13 +20,27 @@ class Signature
     protected $hash;
 
     /**
+     * The resultant encoded
+     *
+     * @var string
+     */
+    protected $encoded;
+
+    /**
      * Initializes the object
      *
      * @param string $hash
      */
-    public function __construct(string $hash)
+    public function __construct(string $hash, string $encoded)
     {
-        $this->hash = $hash;
+        $this->hash    = $hash;
+        $this->encoded = $encoded;
+    }
+
+    /** @return non-empty-string */
+    public function hash(): string
+    {
+        return $this->hash;
     }
 
     /**
@@ -45,22 +59,22 @@ class Signature
     }
 
     /**
-     * Returns the current hash as a string representation of the signature
+     * Returns the current encoded as a string representation of the signature
      *
      * @return string
      */
     public function toString(): string
     {
-        return $this->hash;
+        return $this->encoded;
     }
 
     /**
-     * Returns the current hash as a string representation of the signature
+     * Returns the current encoded as a string representation of the signature
      *
      * @return string
      */
     public function __toString(): string
     {
-        return $this->hash;
+        return $this->toString();
     }
 }

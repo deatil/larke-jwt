@@ -8,15 +8,13 @@ use Generator;
 use DateTimeImmutable;
 use DateTimeInterface;
 use OutOfBoundsException;
-use BadMethodCallException;
 
 use Larke\JWT\Contracts\Key;
 use Larke\JWT\Contracts\Claim;
 use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Contracts\Validatable;
 use Larke\JWT\Claim\RegisteredClaims;
-
-use function array_key_exists;
+use Larke\JWT\Claim\RegisteredHeaders;
 
 /**
  * Basic structure of the JWT
@@ -26,14 +24,14 @@ class Token
     /**
      * The token headers
      *
-     * @var array
+     * @var DataSet
      */
     private $headers;
 
     /**
      * The token claim set
      *
-     * @var array
+     * @var DataSet
      */
     private $claims;
 
@@ -45,38 +43,28 @@ class Token
     private $signature;
 
     /**
-     * The encoded data
-     *
-     * @var array
-     */
-    private $payload;
-
-    /**
      * Initializes the object
      *
-     * @param array     $headers
-     * @param array     $claims
-     * @param array     $payload
+     * @param DataSet   $headers
+     * @param DataSet   $claims
      * @param Signature $signature
      */
     public function __construct(
-        array     $headers = ['alg' => 'none'],
-        array     $claims = [],
-        Signature $signature = null,
-        array     $payload = ['', '']
+        DataSet   $headers,
+        DataSet   $claims,
+        Signature $signature
     ) {
         $this->headers   = $headers;
         $this->claims    = $claims;
         $this->signature = $signature;
-        $this->payload   = $payload;
     }
 
     /**
      * Returns the token headers
      *
-     * @return array
+     * @return DataSet
      */
-    public function getHeaders(): array
+    public function getHeaders(): DataSet
     {
         return $this->headers;
     }
@@ -90,7 +78,7 @@ class Token
      */
     public function hasHeader(string $name): bool
     {
-        return array_key_exists($name, $this->headers);
+        return $this->headers->has($name);
     }
 
     /**
@@ -125,7 +113,7 @@ class Token
      */
     private function getHeaderValue(string $name): mixed
     {
-        $header = $this->headers[$name];
+        $header = $this->headers->get($name);
 
         if ($header instanceof Claim) {
             return $header->getValue();
@@ -137,9 +125,9 @@ class Token
     /**
      * Returns the token claim set
      *
-     * @return array
+     * @return DataSet
      */
-    public function getClaims(): array
+    public function getClaims(): DataSet
     {
         return $this->claims;
     }
@@ -153,7 +141,7 @@ class Token
      */
     public function hasClaim(string $name): bool
     {
-        return array_key_exists($name, $this->claims);
+        return $this->claims->has($name);
     }
 
     /**
@@ -169,7 +157,7 @@ class Token
     public function getClaim(string $name, mixed $default = null): mixed
     {
         if ($this->hasClaim($name)) {
-            return $this->claims[$name]->getValue();
+            return $this->claims->get($name)->getValue();
         }
 
         if ($default === null) {
@@ -186,16 +174,10 @@ class Token
      * @param Key|string $key
      *
      * @return boolean
-     *
-     * @throws BadMethodCallException When token is not signed
      */
     public function verify(Signer $signer, $key): bool
     {
-        if ($this->signature === null) {
-            throw new BadMethodCallException('This token is not signed');
-        }
-
-        if ($this->headers['alg'] !== $signer->getAlgorithmId()) {
+        if ($this->headers->get(RegisteredHeaders::ALGORITHM) !== $signer->getAlgorithmId()) {
             return false;
         }
 
@@ -277,11 +259,21 @@ class Token
      */
     private function getValidatableClaims(): Generator
     {
-        foreach ($this->claims as $claim) {
+        foreach ($this->claims->all() as $claim) {
             if ($claim instanceof Validatable) {
                 yield $claim;
             }
         }
+    }
+
+    /**
+     * Returns the token signature
+     *
+     * @return Signature
+     */
+    public function getSignature(): Signature
+    {
+        return $this->signature;
     }
 
     /**
@@ -291,7 +283,7 @@ class Token
      */
     public function getPayload(): string
     {
-        return $this->payload[0] . '.' . $this->payload[1];
+        return $this->headers->toString() . '.' . $this->claims->toString();
     }
 
     /**
@@ -301,13 +293,9 @@ class Token
      */
     public function toString(): string
     {
-        $data = implode('.', $this->payload);
-
-        if ($this->signature === null) {
-            $data .= '.';
-        }
-
-        return $data;
+        return $this->headers->toString() . '.'
+             . $this->claims->toString() . '.'
+             . $this->signature->toString();
     }
 
     /**

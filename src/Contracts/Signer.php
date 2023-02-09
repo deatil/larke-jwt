@@ -6,8 +6,6 @@ namespace Larke\JWT\Contracts;
 
 use InvalidArgumentException;
 
-use Larke\JWT\Signature;
-
 /**
  * Basic interface for token signers
  */
@@ -33,11 +31,11 @@ interface Signer
      * @param string $payload
      * @param Key|string $key
      *
-     * @return Signature
+     * @return string
      *
      * @throws InvalidArgumentException When given key is invalid
      */
-    public function sign(string $payload, mixed $key): Signature;
+    public function sign(string $payload, mixed $key): string;
 
     /**
      * Returns if the expected hash matches with the data and key
