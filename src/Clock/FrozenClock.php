@@ -9,6 +9,8 @@ use DateTimeImmutable;
 
 use Larke\JWT\Contracts\Clock;
 
+use function date_default_timezone_get;
+
 final class FrozenClock implements Clock
 {
     private $now;
@@ -21,6 +23,11 @@ final class FrozenClock implements Clock
     public static function fromUTC()
     {
         return new self(new DateTimeImmutable('now', new DateTimeZone('UTC')));
+    }
+
+    public static function fromSystemTimezone()
+    {
+        return new self(new DateTimeImmutable('now', new DateTimeZone(date_default_timezone_get())));
     }
 
     public function setTo(DateTimeImmutable $now)

@@ -4,9 +4,9 @@ declare (strict_types = 1);
 
 namespace Larke\JWT;
 
-use DateTime;
-use DateTimeInterface;
 use Generator;
+use DateTimeImmutable;
+use DateTimeInterface;
 use OutOfBoundsException;
 use BadMethodCallException;
 
@@ -218,6 +218,36 @@ class Token
         return true;
     }
 
+    public function isPermittedFor(string $audience)
+    {
+        return $this->getClaim(RegisteredClaims::AUDIENCE) === $audience;
+    }
+    
+    public function isIdentifiedBy(string $id)
+    {
+        return $this->getClaim(RegisteredClaims::ID) === $id;
+    }
+
+    public function isRelatedTo(string $subject)
+    {
+        return $this->getClaim(RegisteredClaims::SUBJECT) === $subject;
+    }
+
+    public function hasBeenIssuedBy(string ...$issuers)
+    {
+        return in_array($this->getClaim(RegisteredClaims::ISSUER), $issuers, true);
+    }
+
+    public function hasBeenIssuedBefore(DateTimeInterface $now)
+    {
+        return $now >= $this->getClaim(RegisteredClaims::ISSUED_AT);
+    }
+
+    public function isMinimumTimeBefore(DateTimeInterface $now)
+    {
+        return $now >= $this->getClaim(RegisteredClaims::NOT_BEFORE);
+    }
+
     /**
      * Determine if the token is expired.
      *
@@ -233,12 +263,9 @@ class Token
             return false;
         }
 
-        $now = $now ?: new DateTime();
+        $now = $now ?: new DateTimeImmutable();
 
-        $expiresAt = new DateTime();
-        $expiresAt->setTimestamp($exp);
-
-        return $now > $expiresAt;
+        return $now > $exp;
     }
 
     /**
@@ -270,7 +297,7 @@ class Token
      *
      * @return string
      */
-    public function __toString()
+    public function toString()
     {
         $data = implode('.', $this->payload);
 
@@ -279,5 +306,15 @@ class Token
         }
 
         return $data;
+    }
+
+    /**
+     * Returns an encoded representation of the token
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->toString();
     }
 }

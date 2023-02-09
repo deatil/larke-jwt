@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Larke\JWT\Format;
 
-use DateTimeImmutable;
+use DateTimeInterface;
 
 use Larke\JWT\Claim\RegisteredClaims;
 use Larke\JWT\Contracts\ClaimsFormatter;
@@ -29,7 +29,7 @@ final class MicrosecondBasedDateConversion implements ClaimsFormatter
 
     private function convertDate(mixed $date)
     {
-        if ($date instanceof DateTimeImmutable) {
+        if ($date instanceof DateTimeInterface) {
             if ($date->format('u') === '000000') {
                 return (int) $date->format('U');
             }

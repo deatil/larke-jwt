@@ -60,8 +60,16 @@ class Basic implements Claim
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function toString()
     {
         return (string) $this->value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __toString()
+    {
+        return $this->toString();
     }
 }

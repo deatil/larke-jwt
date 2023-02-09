@@ -20,9 +20,12 @@
         }
     ],
     "require": {
-        "php": "^5.6|^7.0|^8.0",
+        "php": "~8.1.0 || ~8.2.0",
+        "ext-hash": "*",
+        "ext-json": "*",
+        "ext-openssl": "*",
         "ext-mbstring": "*",
-        "ext-openssl": "*"
+        "ext-sodium": "*"
     },
     "autoload": {
         "psr-4": {

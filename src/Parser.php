@@ -4,10 +4,14 @@ declare (strict_types = 1);
 
 namespace Larke\JWT;
 
+use DateTimeImmutable;
 use InvalidArgumentException;
+
 use Larke\JWT\Contracts\Decoder;
 use Larke\JWT\Encoding\JoseEncoder;
+use Larke\JWT\Claim\RegisteredClaims;
 use Larke\JWT\Claim\Factory as ClaimFactory;
+use Larke\JWT\Exception\InvalidTokenStructure;
 
 /**
  * This class parses the JWT strings and convert them into tokens
@@ -27,6 +31,8 @@ class Parser
      * @var ClaimFactory
      */
     private $claimFactory;
+
+    private const MICROSECOND_PRECISION = 6;
 
     /**
      * Initializes the object
@@ -125,10 +131,32 @@ class Parser
         $claims = (array) $this->decoder->jsonDecode($this->decoder->base64UrlDecode($data));
 
         foreach ($claims as $name => &$value) {
+            if (in_array($name, RegisteredClaims::DATE_CLAIMS)) {
+                $value = $this->convertDate($value);
+            }
+            
             $value = $this->claimFactory->create($name, $value);
         }
 
         return $claims;
+    }
+
+    /** @throws InvalidTokenStructure */
+    private function convertDate(int|float|string $timestamp)
+    {
+        if (! is_numeric($timestamp)) {
+            throw InvalidTokenStructure::dateIsNotParseable($timestamp);
+        }
+
+        $normalizedTimestamp = number_format((float) $timestamp, self::MICROSECOND_PRECISION, '.', '');
+
+        $date = DateTimeImmutable::createFromFormat('U.u', $normalizedTimestamp);
+
+        if ($date === false) {
+            throw InvalidTokenStructure::dateIsNotParseable($normalizedTimestamp);
+        }
+
+        return $date;
     }
 
     /**

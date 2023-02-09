@@ -4,6 +4,9 @@ declare (strict_types = 1);
 
 namespace Larke\JWT;
 
+use DateTimeImmutable;
+
+use Larke\JWT\Clock\SystemClock;
 use Larke\JWT\Claim\RegisteredClaims;
 
 /**
@@ -27,13 +30,13 @@ class ValidationData
     /**
      * Initializes the object
      *
-     * @param int $currentTime
-     * @param int $leeway
+     * @param DateTimeImmutable $currentTime
+     * @param int               $leeway
      */
-    public function __construct($currentTime = null, $leeway = 0)
+    public function __construct(DateTimeImmutable $currentTime = null, int $leeway = 0)
     {
-        $currentTime  = $currentTime ?: time();
-        $this->leeway = (int) $leeway;
+        $currentTime  = $currentTime ?: SystemClock::fromSystemTimezone()->now();
+        $this->leeway = $leeway;
 
         $this->items = [
             RegisteredClaims::ID       => null,
@@ -50,9 +53,9 @@ class ValidationData
      *
      * @param string $id
      */
-    public function identifiedBy($id)
+    public function identifiedBy(string $id)
     {
-        $this->items[RegisteredClaims::ID] = (string) $id;
+        $this->items[RegisteredClaims::ID] = $id;
     }
 
     /**
@@ -60,9 +63,9 @@ class ValidationData
      *
      * @param string $issuer
      */
-    public function issuedBy($issuer)
+    public function issuedBy(string $issuer)
     {
-        $this->items[RegisteredClaims::ISSUER] = (string) $issuer;
+        $this->items[RegisteredClaims::ISSUER] = $issuer;
     }
 
     /**
@@ -70,9 +73,9 @@ class ValidationData
      *
      * @param string $audience
      */
-    public function permittedFor($audience)
+    public function permittedFor(string $audience)
     {
-        $this->items[RegisteredClaims::AUDIENCE] = (string) $audience;
+        $this->items[RegisteredClaims::AUDIENCE] = $audience;
     }
 
     /**
@@ -80,23 +83,23 @@ class ValidationData
      *
      * @param string $subject
      */
-    public function relatedTo($subject)
+    public function relatedTo(string $subject)
     {
-        $this->items[RegisteredClaims::SUBJECT] = (string) $subject;
+        $this->items[RegisteredClaims::SUBJECT] = $subject;
     }
 
     /**
      * Configures the time that "iat", "nbf" and "exp" should be based on
      *
-     * @param int $currentTime
+     * @param DateTimeImmutable $currentTime
      */
-    public function currentTime($currentTime)
+    public function currentTime(DateTimeImmutable $currentTime)
     {
-        $currentTime  = (int) $currentTime;
-
-        $this->items[RegisteredClaims::ISSUED_AT]       = $currentTime + $this->leeway;
-        $this->items[RegisteredClaims::NOT_BEFORE]      = $currentTime + $this->leeway;
-        $this->items[RegisteredClaims::EXPIRATION_TIME] = $currentTime - $this->leeway;
+        $leeway = $this->leeway;
+        
+        $this->items[RegisteredClaims::ISSUED_AT]       = $currentTime->modify("+{$leeway} second");
+        $this->items[RegisteredClaims::NOT_BEFORE]      = $currentTime->modify("+{$leeway} second");
+        $this->items[RegisteredClaims::EXPIRATION_TIME] = $currentTime->modify("-{$leeway} second");
     }
 
     /**
