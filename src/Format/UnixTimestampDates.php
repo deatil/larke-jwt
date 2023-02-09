@@ -14,7 +14,7 @@ use function array_key_exists;
 final class UnixTimestampDates implements ClaimsFormatter
 {
     /** @inheritdoc */
-    public function formatClaims(array $claims)
+    public function formatClaims(array $claims): array
     {
         foreach (RegisteredClaims::DATE_CLAIMS as $claim) {
             if (! array_key_exists($claim, $claims)) {
@@ -27,12 +27,8 @@ final class UnixTimestampDates implements ClaimsFormatter
         return $claims;
     }
 
-    private function convertDate(mixed $date)
+    private function convertDate(DateTimeInterface $date): int
     {
-        if ($date instanceof DateTimeInterface) {
-            return $date->getTimestamp();
-        }
-        
-        return $date;
+        return $date->getTimestamp();
     }
 }

@@ -28,7 +28,7 @@ abstract class Ecdsa extends OpenSSL
     /**
      * {@inheritdoc}
      */
-    public function createHash($payload, Key $key)
+    public function createHash(string $payload, Key $key): string
     {
         return $this->converter->fromAsn1(
             parent::createHash($payload, $key),
@@ -39,7 +39,7 @@ abstract class Ecdsa extends OpenSSL
     /**
      * {@inheritdoc}
      */
-    public function doVerify($expected, $payload, Key $key)
+    public function doVerify(string $expected, string $payload, Key $key): bool
     {
         return parent::doVerify(
             $this->converter->toAsn1($expected, $this->getKeyLength()),
@@ -53,12 +53,12 @@ abstract class Ecdsa extends OpenSSL
      *
      * @internal
      */
-    abstract public function getKeyLength();
+    abstract public function getKeyLength(): int;
 
     /**
      * {@inheritdoc}
      */
-    final public function getKeyType()
+    final public function getKeyType(): string
     {
         return OPENSSL_KEYTYPE_EC;
     }

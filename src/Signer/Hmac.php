@@ -6,6 +6,13 @@ namespace Larke\JWT\Signer;
 
 use Larke\JWT\Contracts\Key;
 
+use function ord;
+use function strlen;
+use function is_string;
+use function hash_hmac;
+use function call_user_func;
+use function function_exists;
+
 /**
  * Base class for hmac signers
  */
@@ -14,7 +21,7 @@ abstract class Hmac extends BaseSigner
     /**
      * {@inheritdoc}
      */
-    public function createHash($payload, Key $key)
+    public function createHash(string $payload, Key $key): string
     {
         return hash_hmac($this->getAlgorithm(), $payload, $key->getContent(), true);
     }
@@ -22,7 +29,7 @@ abstract class Hmac extends BaseSigner
     /**
      * {@inheritdoc}
      */
-    public function doVerify($expected, $payload, Key $key)
+    public function doVerify(string $expected, string $payload, Key $key): bool
     {
         if (!is_string($expected)) {
             return false;
@@ -43,7 +50,7 @@ abstract class Hmac extends BaseSigner
      *
      * @return boolean
      */
-    public function hashEquals($expected, $generated)
+    public function hashEquals(string $expected, string $generated): bool
     {
         $expectedLength = strlen($expected);
 
@@ -67,5 +74,5 @@ abstract class Hmac extends BaseSigner
      *
      * @return string
      */
-    abstract public function getAlgorithm();
+    abstract public function getAlgorithm(): string;
 }

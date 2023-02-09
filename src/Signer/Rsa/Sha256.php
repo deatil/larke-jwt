@@ -14,7 +14,7 @@ final class Sha256 extends Rsa
     /**
      * {@inheritdoc}
      */
-    public function getAlgorithmId()
+    public function getAlgorithmId(): string
     {
         return 'RS256';
     }
@@ -22,7 +22,7 @@ final class Sha256 extends Rsa
     /**
      * {@inheritdoc}
      */
-    public function getAlgorithm()
+    public function getAlgorithm(): string
     {
         return OPENSSL_ALGO_SHA256;
     }

@@ -14,7 +14,7 @@ final class Sha256 extends Hmac
     /**
      * {@inheritdoc}
      */
-    public function getAlgorithmId()
+    public function getAlgorithmId(): string
     {
         return 'HS256';
     }
@@ -22,7 +22,7 @@ final class Sha256 extends Hmac
     /**
      * {@inheritdoc}
      */
-    public function getAlgorithm()
+    public function getAlgorithm(): string
     {
         return 'sha256';
     }

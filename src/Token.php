@@ -16,6 +16,8 @@ use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Contracts\Validatable;
 use Larke\JWT\Claim\RegisteredClaims;
 
+use function array_key_exists;
+
 /**
  * Basic structure of the JWT
  */
@@ -58,10 +60,10 @@ class Token
      * @param Signature $signature
      */
     public function __construct(
-        array $headers = ['alg' => 'none'],
-        array $claims = [],
+        array     $headers = ['alg' => 'none'],
+        array     $claims = [],
         Signature $signature = null,
-        array $payload = ['', '']
+        array     $payload = ['', '']
     ) {
         $this->headers   = $headers;
         $this->claims    = $claims;
@@ -74,7 +76,7 @@ class Token
      *
      * @return array
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }
@@ -86,7 +88,7 @@ class Token
      *
      * @return boolean
      */
-    public function hasHeader($name)
+    public function hasHeader(string $name): bool
     {
         return array_key_exists($name, $this->headers);
     }
@@ -101,7 +103,7 @@ class Token
      *
      * @throws OutOfBoundsException
      */
-    public function getHeader($name, $default = null)
+    public function getHeader(string $name, mixed $default = null): mixed
     {
         if ($this->hasHeader($name)) {
             return $this->getHeaderValue($name);
@@ -121,7 +123,7 @@ class Token
      *
      * @return mixed
      */
-    private function getHeaderValue($name)
+    private function getHeaderValue(string $name): mixed
     {
         $header = $this->headers[$name];
 
@@ -137,7 +139,7 @@ class Token
      *
      * @return array
      */
-    public function getClaims()
+    public function getClaims(): array
     {
         return $this->claims;
     }
@@ -149,7 +151,7 @@ class Token
      *
      * @return boolean
      */
-    public function hasClaim($name)
+    public function hasClaim(string $name): bool
     {
         return array_key_exists($name, $this->claims);
     }
@@ -164,7 +166,7 @@ class Token
      *
      * @throws OutOfBoundsException
      */
-    public function getClaim($name, $default = null)
+    public function getClaim(string $name, mixed $default = null): mixed
     {
         if ($this->hasClaim($name)) {
             return $this->claims[$name]->getValue();
@@ -187,7 +189,7 @@ class Token
      *
      * @throws BadMethodCallException When token is not signed
      */
-    public function verify(Signer $signer, $key)
+    public function verify(Signer $signer, $key): bool
     {
         if ($this->signature === null) {
             throw new BadMethodCallException('This token is not signed');
@@ -207,7 +209,7 @@ class Token
      *
      * @return boolean
      */
-    public function validate(ValidationData $data)
+    public function validate(ValidationData $data): bool
     {
         foreach ($this->getValidatableClaims() as $claim) {
             if (! $claim->validate($data)) {
@@ -218,32 +220,32 @@ class Token
         return true;
     }
 
-    public function isPermittedFor(string $audience)
+    public function isPermittedFor(string $audience): bool
     {
         return $this->getClaim(RegisteredClaims::AUDIENCE) === $audience;
     }
     
-    public function isIdentifiedBy(string $id)
+    public function isIdentifiedBy(string $id): bool
     {
         return $this->getClaim(RegisteredClaims::ID) === $id;
     }
 
-    public function isRelatedTo(string $subject)
+    public function isRelatedTo(string $subject): bool
     {
         return $this->getClaim(RegisteredClaims::SUBJECT) === $subject;
     }
 
-    public function hasBeenIssuedBy(string ...$issuers)
+    public function hasBeenIssuedBy(string ...$issuers): bool
     {
         return in_array($this->getClaim(RegisteredClaims::ISSUER), $issuers, true);
     }
 
-    public function hasBeenIssuedBefore(DateTimeInterface $now)
+    public function hasBeenIssuedBefore(DateTimeInterface $now): bool
     {
         return $now >= $this->getClaim(RegisteredClaims::ISSUED_AT);
     }
 
-    public function isMinimumTimeBefore(DateTimeInterface $now)
+    public function isMinimumTimeBefore(DateTimeInterface $now): bool
     {
         return $now >= $this->getClaim(RegisteredClaims::NOT_BEFORE);
     }
@@ -255,7 +257,7 @@ class Token
      *
      * @return bool
      */
-    public function isExpired(DateTimeInterface $now = null)
+    public function isExpired(DateTimeInterface $now = null): bool
     {
         $exp = $this->getClaim(RegisteredClaims::EXPIRATION_TIME, false);
 
@@ -273,7 +275,7 @@ class Token
      *
      * @return Generator
      */
-    private function getValidatableClaims()
+    private function getValidatableClaims(): Generator
     {
         foreach ($this->claims as $claim) {
             if ($claim instanceof Validatable) {
@@ -287,7 +289,7 @@ class Token
      *
      * @return string
      */
-    public function getPayload()
+    public function getPayload(): string
     {
         return $this->payload[0] . '.' . $this->payload[1];
     }
@@ -297,7 +299,7 @@ class Token
      *
      * @return string
      */
-    public function toString()
+    public function toString(): string
     {
         $data = implode('.', $this->payload);
 
@@ -313,7 +315,7 @@ class Token
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toString();
     }

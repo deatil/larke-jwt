@@ -6,6 +6,9 @@ namespace Larke\JWT\Claim;
 
 use Larke\JWT\Contracts\Claim;
 
+use function array_merge;
+use function call_user_func;
+
 /**
  * Class that create claims
  */
@@ -43,13 +46,13 @@ class Factory
      * Create a new claim
      *
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return Claim
      */
-    public function create($name, $value)
+    public function create(string $name, mixed $value): Claim
     {
-        if (!empty($this->callbacks[$name])) {
+        if (! empty($this->callbacks[$name])) {
             return call_user_func($this->callbacks[$name], $name, $value);
         }
 
@@ -60,11 +63,11 @@ class Factory
      * Creates a claim that can be compared (greator or equals)
      *
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return GreaterOrEqualsTo
      */
-    private function createGreaterOrEqualsTo($name, $value)
+    private function createGreaterOrEqualsTo(string $name, mixed $value): GreaterOrEqualsTo
     {
         return new GreaterOrEqualsTo($name, $value);
     }
@@ -73,11 +76,11 @@ class Factory
      * Creates a claim that can be compared (greator or equals)
      *
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return LesserOrEqualsTo
      */
-    private function createLesserOrEqualsTo($name, $value)
+    private function createLesserOrEqualsTo(string $name, mixed $value): LesserOrEqualsTo
     {
         return new LesserOrEqualsTo($name, $value);
     }
@@ -86,11 +89,11 @@ class Factory
      * Creates a claim that can be compared (equals)
      *
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return EqualsTo
      */
-    private function createEqualsTo($name, $value)
+    private function createEqualsTo(string $name, mixed $value): EqualsTo
     {
         return new EqualsTo($name, $value);
     }
@@ -99,11 +102,11 @@ class Factory
      * Creates a basic claim
      *
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return Basic
      */
-    private function createBasic($name, $value)
+    private function createBasic(string $name, mixed $value): Basic
     {
         return new Basic($name, $value);
     }

@@ -31,7 +31,7 @@ final class MultibyteStringConverter implements SignatureConverter
     const ASN1_NEGATIVE_INTEGER  = '00';
     const BYTE_SIZE              = 2;
 
-    public function toAsn1($signature, $length)
+    public function toAsn1(string $signature, int $length): string
     {
         $signature = bin2hex($signature);
 
@@ -58,12 +58,12 @@ final class MultibyteStringConverter implements SignatureConverter
         return $asn1;
     }
 
-    private static function octetLength($data)
+    private static function octetLength(string $data): int
     {
         return (int) (mb_strlen($data, '8bit') / self::BYTE_SIZE);
     }
 
-    private static function preparePositiveInteger($data)
+    private static function preparePositiveInteger(string $data): string
     {
         if (mb_substr($data, 0, self::BYTE_SIZE, '8bit') > self::ASN1_BIG_INTEGER_LIMIT) {
             return self::ASN1_NEGATIVE_INTEGER . $data;
@@ -77,7 +77,7 @@ final class MultibyteStringConverter implements SignatureConverter
         return $data;
     }
 
-    public function fromAsn1($signature, $length)
+    public function fromAsn1(string $signature, int $length): string
     {
         $message  = bin2hex($signature);
         $position = 0;
@@ -98,7 +98,7 @@ final class MultibyteStringConverter implements SignatureConverter
         return $points;
     }
 
-    private static function readAsn1Content($message, &$position, $length)
+    private static function readAsn1Content(string $message, int &$position, int $length): string
     {
         $content   = mb_substr($message, $position, $length, '8bit');
         $position += $length;
@@ -106,7 +106,7 @@ final class MultibyteStringConverter implements SignatureConverter
         return $content;
     }
 
-    private static function readAsn1Integer($message, &$position)
+    private static function readAsn1Integer(string $message, int &$position): string
     {
         if (self::readAsn1Content($message, $position, self::BYTE_SIZE) !== self::ASN1_INTEGER) {
             throw new InvalidArgumentException('Invalid data. Should contain an integer.');
@@ -117,7 +117,7 @@ final class MultibyteStringConverter implements SignatureConverter
         return self::readAsn1Content($message, $position, $length * self::BYTE_SIZE);
     }
 
-    private static function retrievePositiveInteger($data)
+    private static function retrievePositiveInteger(string $data): string
     {
         while (mb_substr($data, 0, self::BYTE_SIZE, '8bit') === self::ASN1_NEGATIVE_INTEGER
             && mb_substr($data, 2, self::BYTE_SIZE, '8bit') > self::ASN1_BIG_INTEGER_LIMIT) {

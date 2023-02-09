@@ -21,7 +21,7 @@ use function openssl_verify;
 
 abstract class OpenSSL extends BaseSigner
 {
-    public function createHash($payload, Key $key)
+    public function createHash(string $payload, Key $key): string
     {
         $privateKey = $this->getPrivateKey($key->getContent(), $key->getPassphrase());
 
@@ -44,7 +44,7 @@ abstract class OpenSSL extends BaseSigner
      *
      * @return resource
      */
-    private function getPrivateKey($pem, $passphrase)
+    private function getPrivateKey(string $pem, string $passphrase)
     {
         $privateKey = openssl_pkey_get_private($pem, $passphrase);
         $this->validateKey($privateKey);
@@ -53,12 +53,12 @@ abstract class OpenSSL extends BaseSigner
     }
 
     /**
-     * @param $expected
-     * @param $payload
-     * @param $pem
+     * @param string $expected
+     * @param string $payload
+     * @param Key    $key
      * @return bool
      */
-    public function doVerify($expected, $payload, Key $key)
+    public function doVerify(string $expected, string $payload, Key $key): bool
     {
         $publicKey = $this->getPublicKey($key->getContent());
         $result    = openssl_verify($payload, $expected, $publicKey, $this->getAlgorithm());
@@ -72,7 +72,7 @@ abstract class OpenSSL extends BaseSigner
      *
      * @return resource
      */
-    private function getPublicKey($pem)
+    private function getPublicKey(string $pem)
     {
         $publicKey = openssl_pkey_get_public($pem);
         $this->validateKey($publicKey);
@@ -87,7 +87,7 @@ abstract class OpenSSL extends BaseSigner
      *
      * @throws InvalidArgumentException
      */
-    private function validateKey($key)
+    private function validateKey(mixed $key)
     {
         if (is_bool($key)) {
             throw InvalidKeyProvided::cannotBeParsed(openssl_error_string());
@@ -105,12 +105,12 @@ abstract class OpenSSL extends BaseSigner
      *
      * @internal
      */
-    abstract public function getKeyType();
+    abstract public function getKeyType(): string;
 
     /**
      * Returns which algorithm to be used to create/verify the signature (using OpenSSL constants)
      *
      * @internal
      */
-    abstract public function getAlgorithm();
+    abstract public function getAlgorithm(): string;
 }

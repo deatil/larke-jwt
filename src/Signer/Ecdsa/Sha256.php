@@ -14,7 +14,7 @@ final class Sha256 extends Ecdsa
     /**
      * {@inheritdoc}
      */
-    public function getAlgorithmId()
+    public function getAlgorithmId(): string
     {
         return 'ES256';
     }
@@ -22,7 +22,7 @@ final class Sha256 extends Ecdsa
     /**
      * {@inheritdoc}
      */
-    public function getAlgorithm()
+    public function getAlgorithm(): string
     {
         return 'sha256';
     }
@@ -30,7 +30,7 @@ final class Sha256 extends Ecdsa
     /**
      * {@inheritdoc}
      */
-    public function getKeyLength()
+    public function getKeyLength(): int
     {
         return 64;
     }

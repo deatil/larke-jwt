@@ -11,7 +11,7 @@ use const OPENSSL_KEYTYPE_RSA;
  */
 abstract class Rsa extends OpenSSL
 {
-    final public function getKeyType()
+    final public function getKeyType(): string
     {
         return OPENSSL_KEYTYPE_RSA;
     }

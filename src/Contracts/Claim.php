@@ -16,19 +16,26 @@ interface Claim extends JsonSerializable
      *
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Returns the claim value
      *
      * @return mixed
      */
-    public function getValue();
+    public function getValue(): mixed;
 
     /**
      * Returns the string representation of the claim
      *
      * @return string
      */
-    public function __toString();
+    public function toString(): string;
+
+    /**
+     * Returns the string representation of the claim
+     *
+     * @return string
+     */
+    public function __toString(): string;
 }

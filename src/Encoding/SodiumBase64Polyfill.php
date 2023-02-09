@@ -7,14 +7,14 @@ namespace Larke\JWT\Encoding;
 use SodiumException;
 use Larke\JWT\Exception\CannotDecodeContent;
 
+use function strtr;
+use function rtrim;
+use function is_string;
 use function base64_decode;
 use function base64_encode;
 use function function_exists;
-use function is_string;
-use function rtrim;
 use function sodium_base642bin;
 use function sodium_bin2base64;
-use function strtr;
 
 /** @internal */
 final class SodiumBase64Polyfill

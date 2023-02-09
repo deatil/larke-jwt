@@ -13,6 +13,10 @@ use Larke\JWT\Claim\RegisteredClaims;
 use Larke\JWT\Claim\Factory as ClaimFactory;
 use Larke\JWT\Exception\InvalidTokenStructure;
 
+use function explode;
+use function in_array;
+use function is_numeric;
+
 /**
  * This class parses the JWT strings and convert them into tokens
  */
@@ -41,10 +45,10 @@ class Parser
      * @param ClaimFactory $claimFactory
      */
     public function __construct(
-        Decoder $decoder = null,
+        Decoder      $decoder = null,
         ClaimFactory $claimFactory = null
     ) {
-        $this->decoder = $decoder ?: new JoseEncoder();
+        $this->decoder      = $decoder ?: new JoseEncoder();
         $this->claimFactory = $claimFactory ?: new ClaimFactory();
     }
 
@@ -55,11 +59,11 @@ class Parser
      *
      * @return Token
      */
-    public function parse($jwt)
+    public function parse($jwt): Token
     {
-        $data = $this->splitJwt($jwt);
-        $header = $this->parseHeader($data[0]);
-        $claims = $this->parseClaims($data[1]);
+        $data      = $this->splitJwt($jwt);
+        $header    = $this->parseHeader($data[0]);
+        $claims    = $this->parseClaims($data[1]);
         $signature = $this->parseSignature($header, $data[2]);
 
         foreach ($claims as $name => $value) {
@@ -84,12 +88,8 @@ class Parser
      *
      * @throws InvalidArgumentException When JWT is not a string or is invalid
      */
-    protected function splitJwt($jwt)
+    protected function splitJwt(string $jwt): array
     {
-        if (!is_string($jwt)) {
-            throw new InvalidArgumentException('The JWT string must have two dots');
-        }
-
         $data = explode('.', $jwt);
 
         if (count($data) != 3) {
@@ -108,7 +108,7 @@ class Parser
      *
      * @throws InvalidArgumentException When an invalid header is informed
      */
-    protected function parseHeader($data)
+    protected function parseHeader(string  $data): array
     {
         $header = (array) $this->decoder->jsonDecode($this->decoder->base64UrlDecode($data));
 
@@ -126,7 +126,7 @@ class Parser
      *
      * @return array
      */
-    protected function parseClaims($data)
+    protected function parseClaims(string $data): array
     {
         $claims = (array) $this->decoder->jsonDecode($this->decoder->base64UrlDecode($data));
 
@@ -142,7 +142,7 @@ class Parser
     }
 
     /** @throws InvalidTokenStructure */
-    private function convertDate(int|float|string $timestamp)
+    private function convertDate(int|float|string $timestamp): DateTimeImmutable
     {
         if (! is_numeric($timestamp)) {
             throw InvalidTokenStructure::dateIsNotParseable($timestamp);
@@ -167,9 +167,9 @@ class Parser
      *
      * @return Signature
      */
-    protected function parseSignature(array $header, $data)
+    protected function parseSignature(array $header, string $data): Signature
     {
-        if ($data == '' || !isset($header['alg']) || $header['alg'] == 'none') {
+        if (empty($data) || !isset($header['alg']) || $header['alg'] == 'none') {
             return null;
         }
 

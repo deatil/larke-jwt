@@ -16,7 +16,7 @@ composer require lake/larke-jwt
 
 ### Dependencies
 
-- PHP 8.0.2+
+- PHP 8.1.0+
 - OpenSSL Extension
 
 ## Basic usage
@@ -26,19 +26,19 @@ composer require lake/larke-jwt
 Just use the builder to create a new JWT/JWS tokens:
 
 ```php
+use DateTimeImmutable;
 use Larke\JWT\Builder;
 
-$time = time();
+$now   = new DateTimeImmutable();
 $token = (new Builder())
     ->issuedBy('http://example.com') // Configures the issuer (iss claim)
     ->permittedFor('http://example.org') // Configures the audience (aud claim)
     ->identifiedBy('4f1g23a12aa', true) // Configures the id (jti claim), replicating as a header item
-    ->issuedAt($time) // Configures the time that the token was issue (iat claim)
-    ->canOnlyBeUsedAfter($time + 60) // Configures the time that the token can be used (nbf claim)
-    ->expiresAt($time + 3600) // Configures the expiration time of the token (exp claim)
+    ->issuedAt($now) // Configures the time that the token was issue (iat claim)
+    ->canOnlyBeUsedAfter($now->modify('+1 minute')) // Configures the time that the token can be used (nbf claim)
+    ->expiresAt($now->modify('+1 hour')) // Configures the expiration time of the token (exp claim)
     ->withClaim('uid', 1) // Configures a new claim, called "uid"
     ->getToken(); // Retrieves the generated token
-
 
 $token->getHeaders(); // Retrieves the token headers
 $token->getClaims(); // Retrieves the token claims
@@ -70,7 +70,10 @@ echo $token->getClaim('uid'); // will print "1"
 We can easily validate if the token is valid (using the previous token and time as example):
 
 ```php
+use DateTimeImmutable;
 use Larke\JWT\ValidationData;
+
+$now = new DateTimeImmutable();
 
 $data = new ValidationData(); // It will use the current time to validate (iat, nbf and exp)
 $data->issuedBy('http://example.com');
@@ -79,11 +82,11 @@ $data->identifiedBy('4f1g23a12aa');
 
 var_dump($token->validate($data)); // false, because token cannot be used before now() + 60
 
-$data->currentTime($time + 61); // changing the validation time to future
+$data->currentTime($now->modify('+61 seconds')); // changing the validation time to future
 
 var_dump($token->validate($data)); // true, because current time is between "nbf" and "exp" claims
 
-$data->currentTime($time + 4000); // changing the validation time to future
+$data->currentTime($now->modify('+4000 seconds')); // changing the validation time to future
 
 var_dump($token->validate($data)); // false, because token is expired since current time is greater than exp
 
@@ -97,15 +100,15 @@ $dataWithLeeway->identifiedBy('4f1g23a12aa');
 
 var_dump($token->validate($dataWithLeeway)); // false, because token can't be used before now() + 60, not within leeway
 
-$dataWithLeeway->currentTime($time + 51); // changing the validation time to future
+$dataWithLeeway->currentTime($now->modify('+51 seconds')); // changing the validation time to future
 
 var_dump($token->validate($dataWithLeeway)); // true, because current time plus leeway is between "nbf" and "exp" claims
 
-$dataWithLeeway->currentTime($time + 3610); // changing the validation time to future but within leeway
+$dataWithLeeway->currentTime($now->modify('+3610 seconds')); // changing the validation time to future but within leeway
 
 var_dump($token->validate($dataWithLeeway)); // true, because current time - 20 seconds leeway is less than exp
 
-$dataWithLeeway->currentTime($time + 4000); // changing the validation time to future outside of leeway
+$dataWithLeeway->currentTime($now->modify('+4000 seconds')); // changing the validation time to future outside of leeway
 
 var_dump($token->validate($dataWithLeeway)); // false, because token is expired since current time is greater than exp
 ```
@@ -116,7 +119,7 @@ var_dump($token->validate($dataWithLeeway)); // false, because token is expired 
 - If ```ValidationData``` contains claims that are not being used in token or token has claims that are not
 configured in ```ValidationData``` they will be ignored by ```Token::validate()```.
 - ```exp```, ```nbf``` and ```iat``` claims are configured by default in ```ValidationData::__construct()```
-with the current UNIX time (```time()```).
+with the current time (```DateTimeImmutable```).
 - The optional ```$leeway``` parameter of ```ValidationData``` will cause us to use that number of seconds of leeway 
 when validating the time-based claims, pretending we are further in the future for the "Issued At" (```iat```) and "Not 
 Before" (```nbf```) claims and pretending we are further in the past for the "Expiration Time" (```exp```) claim. This
@@ -140,23 +143,23 @@ cannot be influenced by malicious users.
 Hmac signatures are really simple to be used:
 
 ```php
+use DateTimeImmutable;
 use Larke\JWT\Builder;
 use Larke\JWT\Signer\Key\InMemory;
 use Larke\JWT\Signer\Hmac\Sha256;
 
 $signer = new Sha256();
-$time = time();
+$now = new DateTimeImmutable();
 
 $token = (new Builder())
     ->issuedBy('http://example.com') // Configures the issuer (iss claim)
     ->permittedFor('http://example.org') // Configures the audience (aud claim)
     ->identifiedBy('4f1g23a12aa', true) // Configures the id (jti claim), replicating as a header item
-    ->issuedAt($time) // Configures the time that the token was issue (iat claim)
-    ->canOnlyBeUsedAfter($time + 60) // Configures the time that the token can be used (nbf claim)
-    ->expiresAt($time + 3600) // Configures the expiration time of the token (exp claim)
+    ->issuedAt($now) // Configures the time that the token was issue (iat claim)
+    ->canOnlyBeUsedAfter($now->modify('+1 minute')) // Configures the time that the token can be used (nbf claim)
+    ->expiresAt($now->modify('+1 hour')) // Configures the expiration time of the token (exp claim)
     ->withClaim('uid', 1) // Configures a new claim, called "uid"
     ->getToken($signer, InMemory::plainText('testing')); // Retrieves the generated token
-
 
 var_dump($token->verify($signer, 'testing 1')); // false, because the key is different
 var_dump($token->verify($signer, 'testing')); // true, because the key is the same
@@ -167,21 +170,22 @@ var_dump($token->verify($signer, 'testing')); // true, because the key is the sa
 RSA and ECDSA signatures are based on public and private keys so you have to generate using the private key and verify using the public key:
 
 ```php
+use DateTimeImmutable;
 use Larke\JWT\Builder;
 use Larke\JWT\Signer\Key\LocalFileReference;
 use Larke\JWT\Signer\Rsa\Sha256; // you can use Larke\JWT\Signer\Ecdsa\Sha256 if you're using ECDSA keys
 
 $signer = new Sha256();
 $privateKey = LocalFileReference::file('file://{path to your private key}');
-$time = time();
+$now = new DateTimeImmutable();
 
 $token = (new Builder())
     ->issuedBy('http://example.com') // Configures the issuer (iss claim)
     ->permittedFor('http://example.org') // Configures the audience (aud claim)
     ->identifiedBy('4f1g23a12aa', true) // Configures the id (jti claim), replicating as a header item
-    ->issuedAt($time) // Configures the time that the token was issue (iat claim)
-    ->canOnlyBeUsedAfter($time + 60) // Configures the time that the token can be used (nbf claim)
-    ->expiresAt($time + 3600) // Configures the expiration time of the token (exp claim)
+    ->issuedAt($now) // Configures the time that the token was issue (iat claim)
+    ->canOnlyBeUsedAfter($now->modify('+1 minute')) // Configures the time that the token can be used (nbf claim)
+    ->expiresAt($now->modify('+1 hour')) // Configures the expiration time of the token (exp claim)
     ->withClaim('uid', 1) // Configures a new claim, called "uid"
     ->getToken($signer, $privateKey); // Retrieves the generated token
 

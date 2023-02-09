@@ -109,7 +109,7 @@ class ValidationData
      *
      * @return mixed
      */
-    public function get($name)
+    public function get(string $name): mixed
     {
         return isset($this->items[$name]) ? $this->items[$name] : null;
     }
@@ -121,7 +121,7 @@ class ValidationData
      *
      * @return boolean
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         return !empty($this->items[$name]);
     }

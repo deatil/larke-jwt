@@ -14,7 +14,7 @@ final class Sha384 extends Rsa
     /**
      * {@inheritdoc}
      */
-    public function getAlgorithmId()
+    public function getAlgorithmId(): string
     {
         return 'RS384';
     }
@@ -22,7 +22,7 @@ final class Sha384 extends Rsa
     /**
      * {@inheritdoc}
      */
-    public function getAlgorithm()
+    public function getAlgorithm(): string
     {
         return OPENSSL_ALGO_SHA384;
     }

@@ -24,7 +24,7 @@ class Signature
      *
      * @param string $hash
      */
-    public function __construct($hash)
+    public function __construct(string $hash)
     {
         $this->hash = $hash;
     }
@@ -39,7 +39,7 @@ class Signature
      *
      * @return boolean
      */
-    public function verify(Signer $signer, $payload, $key)
+    public function verify(Signer $signer, string $payload, mixed $key): bool
     {
         return $signer->verify($this->hash, $payload, $key);
     }
@@ -49,7 +49,17 @@ class Signature
      *
      * @return string
      */
-    public function __toString()
+    public function toString(): string
+    {
+        return $this->hash;
+    }
+
+    /**
+     * Returns the current hash as a string representation of the signature
+     *
+     * @return string
+     */
+    public function __toString(): string
     {
         return $this->hash;
     }

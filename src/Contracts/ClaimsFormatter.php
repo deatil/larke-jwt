@@ -11,5 +11,5 @@ interface ClaimsFormatter
      *
      * @return array<non-empty-string, mixed>
      */
-    public function formatClaims(array $claims);
+    public function formatClaims(array $claims): array;
 }

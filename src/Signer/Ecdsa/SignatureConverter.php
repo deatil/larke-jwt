@@ -14,7 +14,7 @@ interface SignatureConverter
      *
      * @return string
      */
-    public function fromAsn1($signature, $length);
+    public function fromAsn1(string $signature, int $length): string;
 
     /**
      * Converts the JWA signature into something OpenSSL understands
@@ -24,5 +24,5 @@ interface SignatureConverter
      *
      * @return string
      */
-    public function toAsn1($points, $length);
+    public function toAsn1(string $points, int $length): string;
 }

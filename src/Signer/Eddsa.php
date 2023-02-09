@@ -17,12 +17,12 @@ use function sodium_crypto_sign_verify_detached;
  */
 final class Eddsa extends BaseSigner
 {
-    public function getAlgorithmId()
+    public function getAlgorithmId(): string
     {
         return 'EdDSA';
     }
     
-    public function createHash($payload, Key $key)
+    public function createHash(string $payload, Key $key): string
     {
         try {
             return sodium_crypto_sign_detached($payload, $key->getContent());
@@ -31,7 +31,7 @@ final class Eddsa extends BaseSigner
         }
     }
 
-    public function doVerify($expected, $payload, Key $key)
+    public function doVerify(string $expected, string $payload, Key $key): bool
     {
         try {
             return sodium_crypto_sign_verify_detached($expected, $payload, $key->getContent());

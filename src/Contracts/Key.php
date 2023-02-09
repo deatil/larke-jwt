@@ -12,10 +12,10 @@ interface Key
     /**
      * @return string
      */
-    public function getContent();
+    public function getContent(): string;
 
     /**
      * @return string
      */
-    public function getPassphrase();
+    public function getPassphrase(): string;
 }

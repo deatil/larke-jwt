@@ -14,7 +14,7 @@ use function array_key_exists;
 final class MicrosecondBasedDateConversion implements ClaimsFormatter
 {
     /** @inheritdoc */
-    public function formatClaims(array $claims)
+    public function formatClaims(array $claims): array
     {
         foreach (RegisteredClaims::DATE_CLAIMS as $claim) {
             if (! array_key_exists($claim, $claims)) {
@@ -27,16 +27,12 @@ final class MicrosecondBasedDateConversion implements ClaimsFormatter
         return $claims;
     }
 
-    private function convertDate(mixed $date)
+    private function convertDate(DateTimeInterface $date): int
     {
-        if ($date instanceof DateTimeInterface) {
-            if ($date->format('u') === '000000') {
-                return (int) $date->format('U');
-            }
-
-            return (float) $date->format('U.u');
+        if ($date->format('u') === '000000') {
+            return (int) $date->format('U');
         }
-        
-        return $date;
+
+        return (float) $date->format('U.u');
     }
 }

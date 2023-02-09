@@ -18,5 +18,5 @@ interface Validatable
      *
      * @return boolean
      */
-    public function validate(ValidationData $data);
+    public function validate(ValidationData $data): bool;
 }

@@ -18,12 +18,12 @@ final class Blake2b extends BaseSigner
 {
     private const MINIMUM_KEY_LENGTH_IN_BITS = 256;
 
-    public function getAlgorithmId()
+    public function getAlgorithmId(): string
     {
         return 'BLAKE2B';
     }
 
-    public function createHash($payload, Key $key)
+    public function createHash(string $payload, Key $key): string
     {
         $actualKeyLength = 8 * strlen($key->getContent());
 
@@ -34,7 +34,7 @@ final class Blake2b extends BaseSigner
         return sodium_crypto_generichash($payload, $key->getContent());
     }
 
-    public function doVerify($expected, $payload, Key $key)
+    public function doVerify(string $expected, string $payload, Key $key): bool
     {
         return hash_equals($expected, $this->createHash($payload, $key));
     }

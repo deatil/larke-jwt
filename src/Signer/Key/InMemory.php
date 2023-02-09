@@ -27,12 +27,12 @@ final class InMemory implements Key
         return new self('', '');
     }
 
-    public static function plainText(string $contents, string $passphrase = '')
+    public static function plainText(string $contents, string $passphrase = ''): self
     {
         return new self($contents, $passphrase);
     }
 
-    public static function base64Encoded(string $contents, string $passphrase = '')
+    public static function base64Encoded(string $contents, string $passphrase = ''): self
     {
         $decoded = base64_decode($contents, true);
 
@@ -44,7 +44,7 @@ final class InMemory implements Key
     }
 
     /** @throws FileCouldNotBeRead */
-    public static function file(string $path, string $passphrase = '')
+    public static function file(string $path, string $passphrase = ''): self
     {
         try {
             $file = new SplFileObject($path);
@@ -58,12 +58,12 @@ final class InMemory implements Key
         return new self($contents, $passphrase);
     }
 
-    public function getContent()
+    public function getContent(): string
     {
         return $this->contents;
     }
 
-    public function getPassphrase()
+    public function getPassphrase(): string
     {
         return $this->passphrase;
     }
