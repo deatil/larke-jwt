@@ -28,7 +28,7 @@ Just use the builder to create a new JWT/JWS tokens:
 ```php
 use DateTimeImmutable;
 use Larke\JWT\Builder;
-use Larke\JWT\Signer\Rsa\None;
+use Larke\JWT\Signer\None;
 use Larke\JWT\Signer\Key\InMemory;
 
 $now    = new DateTimeImmutable();
@@ -150,8 +150,8 @@ Hmac signatures are really simple to be used:
 ```php
 use DateTimeImmutable;
 use Larke\JWT\Builder;
-use Larke\JWT\Signer\Key\InMemory;
 use Larke\JWT\Signer\Hmac\Sha256;
+use Larke\JWT\Signer\Key\InMemory;
 
 $now    = new DateTimeImmutable();
 $signer = new Sha256();
@@ -184,9 +184,9 @@ use Larke\JWT\Builder;
 use Larke\JWT\Signer\Key\LocalFileReference;
 use Larke\JWT\Signer\Rsa\Sha256; // you can use Larke\JWT\Signer\Ecdsa\Sha256 if you're using ECDSA keys
 
-$signer = new Sha256();
+$now        = new DateTimeImmutable();
+$signer     = new Sha256();
 $privateKey = LocalFileReference::file('file://{path to your private key}');
-$now = new DateTimeImmutable();
 
 $token = (new Builder())
     ->issuedBy('http://example.com') // Configures the issuer (iss claim)
