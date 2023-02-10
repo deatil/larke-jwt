@@ -18,6 +18,7 @@ composer require lake/larke-jwt
 
 - PHP 8.1.0+
 - OpenSSL Extension
+- sodium Extension
 
 ## Basic usage
 
@@ -133,7 +134,7 @@ as mentioned in [section 4.1 of RFC 7519](https://tools.ietf.org/html/rfc7519#se
 
 ## Token signature
 
-We can use signatures to be able to verify if the token was not modified after its generation. This library implements Hmac, RSA and ECDSA signatures (using 256, 384 and 512).
+We can use signatures to be able to verify if the token was not modified after its generation. This library implements `Hmac`, `RSA`, `ECDSA`, `EdDSA` and `Blake2b` signatures (using 256, 384 and 512). The `none` is old signatures.
 
 ### Important
 
@@ -143,7 +144,7 @@ to use, or else your application will be vulnerable to a [critical JWT security 
 The examples below are safe because the choice in `Signer` is hard-coded and
 cannot be influenced by malicious users.
 
-### Hmac
+### Hmac and Blake2b
 
 Hmac signatures are really simple to be used:
 
@@ -174,9 +175,9 @@ var_dump($token->verify($signer, $key1)); // false, because the key is different
 var_dump($token->verify($signer, $key2)); // true, because the key is the same
 ```
 
-### RSA and ECDSA
+### RSA, ECDSA and EdDSA
 
-RSA and ECDSA signatures are based on public and private keys so you have to generate using the private key and verify using the public key:
+RSA, ECDSA and EdDSA signatures are based on public and private keys so you have to generate using the private key and verify using the public key:
 
 ```php
 use DateTimeImmutable;
