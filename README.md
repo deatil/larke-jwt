@@ -28,8 +28,13 @@ Just use the builder to create a new JWT/JWS tokens:
 ```php
 use DateTimeImmutable;
 use Larke\JWT\Builder;
+use Larke\JWT\Signer\Rsa\None;
+use Larke\JWT\Signer\Key\InMemory;
 
-$now   = new DateTimeImmutable();
+$now    = new DateTimeImmutable();
+$signer = new None();
+$key    = InMemory::plainText('testing')
+
 $token = (new Builder())
     ->issuedBy('http://example.com') // Configures the issuer (iss claim)
     ->permittedFor('http://example.org') // Configures the audience (aud claim)
@@ -38,7 +43,7 @@ $token = (new Builder())
     ->canOnlyBeUsedAfter($now->modify('+1 minute')) // Configures the time that the token can be used (nbf claim)
     ->expiresAt($now->modify('+1 hour')) // Configures the expiration time of the token (exp claim)
     ->withClaim('uid', 1) // Configures a new claim, called "uid"
-    ->getToken(); // Retrieves the generated token
+    ->getToken($signer, $key); // Retrieves the generated token
 
 $token->getHeaders(); // Retrieves the token headers
 $token->getClaims(); // Retrieves the token claims
@@ -57,7 +62,7 @@ Use the parser to create a new token from a JWT string (using the previous token
 use Larke\JWT\Parser;
 
 $token = (new Parser())->parse((string) $token); // Parses from a string
-$token->getHeaders(); // Retrieves the token header
+$token->getHeaders(); // Retrieves the token headers
 $token->getClaims(); // Retrieves the token claims
 
 echo $token->getHeader('jti'); // will print "4f1g23a12aa"
@@ -91,9 +96,9 @@ $data->currentTime($now->modify('+4000 seconds')); // changing the validation ti
 var_dump($token->validate($data)); // false, because token is expired since current time is greater than exp
 
 // We can also use the $leeway parameter to deal with clock skew (see notes below)
-// If token's claimed time is invalid but the difference between that and the validation time is less than $leeway, 
+// If token's claimed now is invalid but the difference between that and the validation time is less than $leeway, 
 // then token is still considered valid
-$dataWithLeeway = new ValidationData($time, 20); 
+$dataWithLeeway = new ValidationData($now, 20); 
 $dataWithLeeway->issuedBy('http://example.com');
 $dataWithLeeway->permittedFor('http://example.org');
 $dataWithLeeway->identifiedBy('4f1g23a12aa');
@@ -148,8 +153,9 @@ use Larke\JWT\Builder;
 use Larke\JWT\Signer\Key\InMemory;
 use Larke\JWT\Signer\Hmac\Sha256;
 
+$now    = new DateTimeImmutable();
 $signer = new Sha256();
-$now = new DateTimeImmutable();
+$key    = InMemory::plainText('testing');
 
 $token = (new Builder())
     ->issuedBy('http://example.com') // Configures the issuer (iss claim)
@@ -159,10 +165,13 @@ $token = (new Builder())
     ->canOnlyBeUsedAfter($now->modify('+1 minute')) // Configures the time that the token can be used (nbf claim)
     ->expiresAt($now->modify('+1 hour')) // Configures the expiration time of the token (exp claim)
     ->withClaim('uid', 1) // Configures a new claim, called "uid"
-    ->getToken($signer, InMemory::plainText('testing')); // Retrieves the generated token
+    ->getToken($signer, $key); // Retrieves the generated token
 
-var_dump($token->verify($signer, 'testing 1')); // false, because the key is different
-var_dump($token->verify($signer, 'testing')); // true, because the key is the same
+$key1 = InMemory::plainText('testing 1');
+$key2 = InMemory::plainText('testing');
+
+var_dump($token->verify($signer, $key1)); // false, because the key is different
+var_dump($token->verify($signer, $key2)); // true, because the key is the same
 ```
 
 ### RSA and ECDSA
