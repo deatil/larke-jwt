@@ -134,7 +134,7 @@ as mentioned in [section 4.1 of RFC 7519](https://tools.ietf.org/html/rfc7519#se
 
 ## Token signature
 
-We can use signatures to be able to verify if the token was not modified after its generation. This library implements `Hmac`, `RSA`, `ECDSA`, `EdDSA` and `Blake2b` signatures (using 256, 384 and 512). The `none` is old signatures.
+We can use signatures to be able to verify if the token was not modified after its generation. This library implements `Hmac`, `RSA`, `ECDSA`, `EdDSA` and `Blake2b` signatures (using 256, 384 and 512). The `none` is not signatures.
 
 ### Important
 
