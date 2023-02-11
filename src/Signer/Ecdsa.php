@@ -58,7 +58,7 @@ abstract class Ecdsa extends OpenSSL
     /**
      * {@inheritdoc}
      */
-    final public function getKeyType(): string
+    final public function getKeyType(): int
     {
         return OPENSSL_KEYTYPE_EC;
     }

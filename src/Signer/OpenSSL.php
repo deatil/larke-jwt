@@ -105,12 +105,12 @@ abstract class OpenSSL extends BaseSigner
      *
      * @internal
      */
-    abstract public function getKeyType(): string;
+    abstract public function getKeyType(): int;
 
     /**
      * Returns which algorithm to be used to create/verify the signature (using OpenSSL constants)
      *
      * @internal
      */
-    abstract public function getAlgorithm(): string;
+    abstract public function getAlgorithm(): mixed;
 }

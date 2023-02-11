@@ -14,12 +14,12 @@ class Basic implements Claim
     /**
      * @var string
      */
-    private $name;
+    private string $name;
 
     /**
      * @var mixed
      */
-    private $value;
+    private mixed $value;
 
     /**
      * Initializes the claim

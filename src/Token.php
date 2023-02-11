@@ -26,21 +26,21 @@ class Token
      *
      * @var DataSet
      */
-    private $headers;
+    private DataSet $headers;
 
     /**
      * The token claim set
      *
      * @var DataSet
      */
-    private $claims;
+    private DataSet $claims;
 
     /**
      * The token signature
      *
      * @var Signature
      */
-    private $signature;
+    private Signature $signature;
 
     /**
      * Initializes the object

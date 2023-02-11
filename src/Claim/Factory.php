@@ -19,7 +19,7 @@ class Factory
      *
      * @var array
      */
-    private $callbacks = [];
+    private array $callbacks = [];
 
     /**
      * Initializes the factory, registering the default callbacks

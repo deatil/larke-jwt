@@ -23,13 +23,13 @@ use const STR_PAD_LEFT;
  */
 final class MultibyteStringConverter implements SignatureConverter
 {
-    const ASN1_SEQUENCE          = '30';
-    const ASN1_INTEGER           = '02';
-    const ASN1_MAX_SINGLE_BYTE   = 128;
-    const ASN1_LENGTH_2BYTES     = '81';
-    const ASN1_BIG_INTEGER_LIMIT = '7f';
-    const ASN1_NEGATIVE_INTEGER  = '00';
-    const BYTE_SIZE              = 2;
+    private const ASN1_SEQUENCE          = '30';
+    private const ASN1_INTEGER           = '02';
+    private const ASN1_MAX_SINGLE_BYTE   = 128;
+    private const ASN1_LENGTH_2BYTES     = '81';
+    private const ASN1_BIG_INTEGER_LIMIT = '7f';
+    private const ASN1_NEGATIVE_INTEGER  = '00';
+    private const BYTE_SIZE              = 2;
 
     public function toAsn1(string $signature, int $length): string
     {

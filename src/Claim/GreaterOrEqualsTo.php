@@ -6,7 +6,7 @@ namespace Larke\JWT\Claim;
 
 use Larke\JWT\Contracts\Claim;
 use Larke\JWT\Contracts\Validatable;
-use Larke\JWT\ValidationData;
+use Larke\JWT\Contracts\ValidationData;
 
 /**
  * Validatable claim that checks if value is greater or equals the given data

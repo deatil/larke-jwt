@@ -22,7 +22,7 @@ final class Sha512 extends Rsa
     /**
      * {@inheritdoc}
      */
-    public function getAlgorithm(): string
+    public function getAlgorithm(): mixed
     {
         return OPENSSL_ALGO_SHA512;
     }

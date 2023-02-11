@@ -22,7 +22,7 @@ final class Sha256 extends Ecdsa
     /**
      * {@inheritdoc}
      */
-    public function getAlgorithm(): string
+    public function getAlgorithm(): mixed
     {
         return 'sha256';
     }

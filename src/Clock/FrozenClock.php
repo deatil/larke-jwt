@@ -13,7 +13,7 @@ use function date_default_timezone_get;
 
 final class FrozenClock implements Clock
 {
-    private $now;
+    private DateTimeImmutable $now;
 
     public function __construct(DateTimeImmutable $now)
     {
@@ -30,7 +30,7 @@ final class FrozenClock implements Clock
         return new self(new DateTimeImmutable('now', new DateTimeZone(date_default_timezone_get())));
     }
 
-    public function setTo(DateTimeImmutable $now)
+    public function setTo(DateTimeImmutable $now): void
     {
         $this->now = $now;
     }

@@ -8,9 +8,9 @@ use function array_key_exists;
 
 final class DataSet
 {
-    private $data;
+    private array $data;
     
-    private $encoded;
+    private string $encoded;
     
     /** @param array<non-empty-string, mixed> $data */
     public function __construct(array $data, string $encoded)

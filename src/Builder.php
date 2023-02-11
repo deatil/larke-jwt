@@ -9,6 +9,7 @@ use DateTimeImmutable;
 use Larke\JWT\Contracts\Key;
 use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Contracts\Encoder;
+use Larke\JWT\Contracts\ClaimsFormatter;
 use Larke\JWT\Encoding\JoseEncoder;
 use Larke\JWT\Claim\Factory as ClaimFactory;
 use Larke\JWT\Claim\RegisteredClaims;
@@ -27,7 +28,7 @@ class Builder
      *
      * @var array
      */
-    private $headers = [
+    private array $headers = [
         RegisteredHeaders::TYPE      => 'JWT', 
         RegisteredHeaders::ALGORITHM => 'none'
     ];
@@ -37,34 +38,35 @@ class Builder
      *
      * @var array
      */
-    private $claims = [];
+    private array $claims = [];
 
     /**
      * The data encoder
      *
      * @var Encoder
      */
-    private $encoder;
+    private Encoder $encoder;
 
     /**
      * The factory of claims
      *
      * @var ClaimFactory
      */
-    private $claimFactory;
+    private ClaimFactory $claimFactory;
 
     /**
      * The formatter of claims
      *
      * @var ClaimsFormatter
      */
-    private $claimFormatter;
+    private ClaimsFormatter $claimFormatter;
 
     /**
      * Initializes a new builder
      *
-     * @param Encoder $encoder
-     * @param ClaimFactory $claimFactory
+     * @param Encoder         $encoder
+     * @param ClaimFactory    $claimFactory
+     * @param ClaimsFormatter $claimFormatter
      */
     public function __construct(
         Encoder         $encoder = null,

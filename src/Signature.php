@@ -17,14 +17,14 @@ class Signature
      *
      * @var string
      */
-    protected $hash;
+    protected string $hash;
 
     /**
      * The resultant encoded
      *
      * @var string
      */
-    protected $encoded;
+    protected string $encoded;
 
     /**
      * Initializes the object

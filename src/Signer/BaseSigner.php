@@ -4,8 +4,8 @@ declare (strict_types = 1);
 
 namespace Larke\JWT\Signer;
 
-use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Contracts\Key;
+use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Signer\Key\InMemory;
 use Larke\JWT\Claim\RegisteredHeaders;
 
@@ -19,7 +19,7 @@ abstract class BaseSigner implements Signer
     /**
      * {@inheritdoc}
      */
-    public function modifyHeader(array &$headers)
+    public function modifyHeader(array &$headers): void
     {
         $headers[RegisteredHeaders::ALGORITHM] = $this->getAlgorithmId();
     }

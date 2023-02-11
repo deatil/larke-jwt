@@ -29,14 +29,14 @@ class Parser
      *
      * @var Decoder
      */
-    private $decoder;
+    private Decoder $decoder;
 
     /**
      * The claims factory
      *
      * @var ClaimFactory
      */
-    private $claimFactory;
+    private ClaimFactory $claimFactory;
 
     private const MICROSECOND_PRECISION = 6;
 

@@ -6,7 +6,7 @@ namespace Larke\JWT\Claim;
 
 use Larke\JWT\Contracts\Claim;
 use Larke\JWT\Contracts\Validatable;
-use Larke\JWT\ValidationData;
+use Larke\JWT\Contracts\ValidationData;
 
 /**
  * Validatable claim that checks if value is strictly equals to the given data

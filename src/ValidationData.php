@@ -8,24 +8,27 @@ use DateTimeImmutable;
 
 use Larke\JWT\Clock\SystemClock;
 use Larke\JWT\Claim\RegisteredClaims;
+use Larke\JWT\Contracts\ValidationData as BaseValidationData;
+
+use function array_key_exists;
 
 /**
  * Class that wraps validation values
  */
-class ValidationData
+class ValidationData implements BaseValidationData
 {
     /**
      * The list of things to be validated
      *
      * @var array
      */
-    private $items;
+    private array $items;
 
     /**
      * The leeway (in seconds) to use when validating time claims
      * @var int
      */
-    private $leeway;
+    private int $leeway;
 
     /**
      * Initializes the object
@@ -33,8 +36,10 @@ class ValidationData
      * @param DateTimeImmutable $currentTime
      * @param int               $leeway
      */
-    public function __construct(DateTimeImmutable $currentTime = null, int $leeway = 0)
-    {
+    public function __construct(
+        DateTimeImmutable $currentTime = null, 
+        int $leeway = 0
+    ) {
         $currentTime  = $currentTime ?: SystemClock::fromSystemTimezone()->now();
         $this->leeway = $leeway;
 
@@ -53,7 +58,7 @@ class ValidationData
      *
      * @param string $id
      */
-    public function identifiedBy(string $id)
+    public function identifiedBy(string $id): void
     {
         $this->items[RegisteredClaims::ID] = $id;
     }
@@ -63,7 +68,7 @@ class ValidationData
      *
      * @param string $issuer
      */
-    public function issuedBy(string $issuer)
+    public function issuedBy(string $issuer): void
     {
         $this->items[RegisteredClaims::ISSUER] = $issuer;
     }
@@ -73,7 +78,7 @@ class ValidationData
      *
      * @param string $audience
      */
-    public function permittedFor(string $audience)
+    public function permittedFor(string $audience): void
     {
         $this->items[RegisteredClaims::AUDIENCE] = $audience;
     }
@@ -83,9 +88,19 @@ class ValidationData
      *
      * @param string $subject
      */
-    public function relatedTo(string $subject)
+    public function relatedTo(string $subject): void
     {
         $this->items[RegisteredClaims::SUBJECT] = $subject;
+    }
+
+    /**
+     * The leeway (in seconds) to use when validating time claims
+     *
+     * @param int $leeway
+     */
+    public function leewayFor(int $leeway): void
+    {
+        $this->leeway = $leeway;
     }
 
     /**
@@ -93,7 +108,7 @@ class ValidationData
      *
      * @param DateTimeImmutable $currentTime
      */
-    public function currentTime(DateTimeImmutable $currentTime)
+    public function currentTime(DateTimeImmutable $currentTime): void
     {
         $leeway = $this->leeway;
         
@@ -111,7 +126,7 @@ class ValidationData
      */
     public function get(string $name): mixed
     {
-        return isset($this->items[$name]) ? $this->items[$name] : null;
+        return $this->items[$name] ?? null;
     }
 
     /**
@@ -123,6 +138,6 @@ class ValidationData
      */
     public function has(string $name): bool
     {
-        return !empty($this->items[$name]);
+        return array_key_exists($name, $this->items);
     }
 }
