@@ -23,6 +23,6 @@ final class None extends BaseSigner
 
     public function doVerify(string $expected, string $payload, Key $key): bool
     {
-        return true;
+        return $expected === '';
     }
 }
