@@ -13,13 +13,14 @@ use Larke\JWT\Contracts\Key;
 use Larke\JWT\Contracts\Claim;
 use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Contracts\Validatable;
+use Larke\JWT\Contracts\UnencryptedToken;
 use Larke\JWT\Claim\RegisteredClaims;
 use Larke\JWT\Claim\RegisteredHeaders;
 
 /**
  * Basic structure of the JWT
  */
-class Token
+class Token implements UnencryptedToken
 {
     /**
      * The token headers
