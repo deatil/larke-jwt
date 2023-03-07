@@ -46,13 +46,13 @@ $token = (new Builder())
     ->withClaim('uid', 1) // Configures a new claim, called "uid"
     ->getToken($signer, $key); // Retrieves the generated token
 
-$token->getHeaders(); // Retrieves the token headers
-$token->getClaims(); // Retrieves the token claims
+$token->headers()->all(); // Retrieves the token headers
+$token->claims()->all(); // Retrieves the token claims
 
-echo $token->getHeader('jti'); // will print "4f1g23a12aa"
-echo $token->getClaim('iss'); // will print "http://example.com"
-echo $token->getClaim('uid'); // will print "1"
-echo $token; // The string representation of the object is a JWT string (pretty easy, right?)
+echo $token->headers()->get('jti')->getValue(); // will print "4f1g23a12aa"
+echo $token->claims()->get('iss')->getValue(); // will print "http://example.com"
+echo $token->claims()->get('uid')->getValue(); // will print "1"
+echo $token->toString(); // The string representation of the object is a JWT string (pretty easy, right?)
 ```
 
 ### Parsing from strings
@@ -63,12 +63,12 @@ Use the parser to create a new token from a JWT string (using the previous token
 use Larke\JWT\Parser;
 
 $token = (new Parser())->parse((string) $token); // Parses from a string
-$token->getHeaders(); // Retrieves the token headers
-$token->getClaims(); // Retrieves the token claims
+$token->headers()->all(); // Retrieves the token headers
+$token->claims()->all(); // Retrieves the token claims
 
-echo $token->getHeader('jti'); // will print "4f1g23a12aa"
-echo $token->getClaim('iss'); // will print "http://example.com"
-echo $token->getClaim('uid'); // will print "1"
+echo $token->headers()->get('jti')->getValue(); // will print "4f1g23a12aa"
+echo $token->claims()->get('iss')->getValue(); // will print "http://example.com"
+echo $token->claims()->get('uid')->getValue(); // will print "1"
 ```
 
 ### Validating

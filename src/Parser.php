@@ -61,7 +61,7 @@ class Parser
      *
      * @return Token
      */
-    public function parse($jwt): Token
+    public function parse(string $jwt): Token
     {
         [$encodedHeaders, $encodedClaims, $encodedSignature] = $this->splitJwt($jwt);
         
