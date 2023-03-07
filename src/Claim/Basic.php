@@ -64,12 +64,4 @@ class Basic implements Claim
     {
         return (string) $this->value;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString(): string
-    {
-        return $this->toString();
-    }
 }

@@ -67,14 +67,4 @@ class Signature
     {
         return $this->encoded;
     }
-
-    /**
-     * Returns the current encoded as a string representation of the signature
-     *
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return $this->toString();
-    }
 }

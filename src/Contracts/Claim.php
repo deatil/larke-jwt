@@ -31,11 +31,4 @@ interface Claim extends JsonSerializable
      * @return string
      */
     public function toString(): string;
-
-    /**
-     * Returns the string representation of the claim
-     *
-     * @return string
-     */
-    public function __toString(): string;
 }

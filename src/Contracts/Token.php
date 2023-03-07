@@ -12,7 +12,7 @@ interface Token
     /**
      * Returns the token headers
      */
-    public function getHeaders(): DataSet;
+    public function headers(): DataSet;
 
     /**
      * Returns if the token is allowed to be used by the audience

@@ -12,17 +12,17 @@ interface UnencryptedToken extends Token
     /**
      * Returns the token claims
      */
-    public function getClaims(): DataSet;
+    public function claims(): DataSet;
 
     /**
      * Returns the token signature
      */
-    public function getSignature(): Signature;
+    public function signature(): Signature;
 
     /**
      * Returns the token payload
      *
      * @return non-empty-string
      */
-    public function getPayload(): string;
+    public function payload(): string;
 }

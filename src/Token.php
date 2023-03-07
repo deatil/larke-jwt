@@ -7,7 +7,6 @@ namespace Larke\JWT;
 use Generator;
 use DateTimeImmutable;
 use DateTimeInterface;
-use OutOfBoundsException;
 
 use Larke\JWT\Contracts\Key;
 use Larke\JWT\Contracts\Claim;
@@ -65,62 +64,9 @@ class Token implements UnencryptedToken
      *
      * @return DataSet
      */
-    public function getHeaders(): DataSet
+    public function headers(): DataSet
     {
         return $this->headers;
-    }
-
-    /**
-     * Returns if the header is configured
-     *
-     * @param string $name
-     *
-     * @return boolean
-     */
-    public function hasHeader(string $name): bool
-    {
-        return $this->headers->has($name);
-    }
-
-    /**
-     * Returns the value of a token header
-     *
-     * @param string $name
-     * @param mixed  $default
-     *
-     * @return mixed
-     *
-     * @throws OutOfBoundsException
-     */
-    public function getHeader(string $name, mixed $default = null): mixed
-    {
-        if ($this->hasHeader($name)) {
-            return $this->getHeaderValue($name);
-        }
-
-        if ($default === null) {
-            throw new OutOfBoundsException('Requested header is not configured');
-        }
-
-        return $default;
-    }
-
-    /**
-     * Returns the value stored in header
-     *
-     * @param string $name
-     *
-     * @return mixed
-     */
-    private function getHeaderValue(string $name): mixed
-    {
-        $header = $this->headers->get($name);
-
-        if ($header instanceof Claim) {
-            return $header->getValue();
-        }
-
-        return $header;
     }
 
     /**
@@ -128,44 +74,29 @@ class Token implements UnencryptedToken
      *
      * @return DataSet
      */
-    public function getClaims(): DataSet
+    public function claims(): DataSet
     {
         return $this->claims;
     }
 
     /**
-     * Returns if the claim is configured
+     * Returns the token signature
      *
-     * @param string $name
-     *
-     * @return boolean
+     * @return Signature
      */
-    public function hasClaim(string $name): bool
+    public function signature(): Signature
     {
-        return $this->claims->has($name);
+        return $this->signature;
     }
 
     /**
-     * Returns the value of a token claim
+     * Returns the token payload
      *
-     * @param string $name
-     * @param mixed  $default
-     *
-     * @return mixed
-     *
-     * @throws OutOfBoundsException
+     * @return string
      */
-    public function getClaim(string $name, mixed $default = null): mixed
+    public function payload(): string
     {
-        if ($this->hasClaim($name)) {
-            return $this->claims->get($name)->getValue();
-        }
-
-        if ($default === null) {
-            throw new OutOfBoundsException('Requested claim is not configured');
-        }
-
-        return $default;
+        return $this->headers->toString() . '.' . $this->claims->toString();
     }
 
     /**
@@ -182,7 +113,7 @@ class Token implements UnencryptedToken
             return false;
         }
 
-        return $this->signature->verify($signer, $this->getPayload(), $key);
+        return $this->signature->verify($signer, $this->payload(), $key);
     }
 
     /**
@@ -201,6 +132,20 @@ class Token implements UnencryptedToken
         }
 
         return true;
+    }
+
+    /**
+     * Yields the validatable claims
+     *
+     * @return Generator
+     */
+    private function getValidatableClaims(): Generator
+    {
+        foreach ($this->claims->all() as $claim) {
+            if ($claim instanceof Validatable) {
+                yield $claim;
+            }
+        }
     }
 
     public function isPermittedFor(string $audience): bool
@@ -233,13 +178,6 @@ class Token implements UnencryptedToken
         return $now >= $this->getClaim(RegisteredClaims::NOT_BEFORE);
     }
 
-    /**
-     * Determine if the token is expired.
-     *
-     * @param DateTimeInterface $now Defaults to the current time.
-     *
-     * @return bool
-     */
     public function isExpired(DateTimeInterface $now = null): bool
     {
         $exp = $this->getClaim(RegisteredClaims::EXPIRATION_TIME, false);
@@ -254,40 +192,6 @@ class Token implements UnencryptedToken
     }
 
     /**
-     * Yields the validatable claims
-     *
-     * @return Generator
-     */
-    private function getValidatableClaims(): Generator
-    {
-        foreach ($this->claims->all() as $claim) {
-            if ($claim instanceof Validatable) {
-                yield $claim;
-            }
-        }
-    }
-
-    /**
-     * Returns the token signature
-     *
-     * @return Signature
-     */
-    public function getSignature(): Signature
-    {
-        return $this->signature;
-    }
-
-    /**
-     * Returns the token payload
-     *
-     * @return string
-     */
-    public function getPayload(): string
-    {
-        return $this->headers->toString() . '.' . $this->claims->toString();
-    }
-
-    /**
      * Returns an encoded representation of the token
      *
      * @return string
@@ -297,15 +201,5 @@ class Token implements UnencryptedToken
         return $this->headers->toString() . '.'
              . $this->claims->toString() . '.'
              . $this->signature->toString();
-    }
-
-    /**
-     * Returns an encoded representation of the token
-     *
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return $this->toString();
     }
 }
