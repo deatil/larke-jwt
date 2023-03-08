@@ -15,7 +15,7 @@ use function array_key_exists;
 /**
  * Class that wraps validation values
  */
-class ValidationData implements BaseValidationData
+final class ValidationData implements BaseValidationData
 {
     /**
      * The list of things to be validated
@@ -37,7 +37,7 @@ class ValidationData implements BaseValidationData
      * @param int               $leeway
      */
     public function __construct(
-        DateTimeImmutable $currentTime = null, 
+        ?DateTimeImmutable $currentTime = null, 
         int $leeway = 0
     ) {
         $currentTime  = $currentTime ?: SystemClock::fromSystemTimezone()->now();

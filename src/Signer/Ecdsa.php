@@ -20,8 +20,9 @@ abstract class Ecdsa extends OpenSSL
      */
     private $converter;
 
-    public function __construct(SignatureConverter $converter = null)
-    {
+    public function __construct(
+        ?SignatureConverter $converter = null
+    ) {
         $this->converter = $converter ?: new MultibyteStringConverter();
     }
 

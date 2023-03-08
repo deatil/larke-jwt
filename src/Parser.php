@@ -8,10 +8,10 @@ use DateTimeImmutable;
 use InvalidArgumentException;
 
 use Larke\JWT\Contracts\Decoder;
+use Larke\JWT\Contracts\UnencryptedToken;
 use Larke\JWT\Encoding\JoseEncoder;
 use Larke\JWT\Claim\RegisteredClaims;
 use Larke\JWT\Claim\RegisteredHeaders;
-use Larke\JWT\Claim\Factory as ClaimFactory;
 use Larke\JWT\Exception\InvalidTokenStructure;
 
 use function explode;
@@ -22,7 +22,7 @@ use function array_key_exists;
 /**
  * This class parses the JWT strings and convert them into tokens
  */
-class Parser
+final class Parser
 {
     /**
      * The data decoder
@@ -31,27 +31,17 @@ class Parser
      */
     private Decoder $decoder;
 
-    /**
-     * The claims factory
-     *
-     * @var ClaimFactory
-     */
-    private ClaimFactory $claimFactory;
-
     private const MICROSECOND_PRECISION = 6;
 
     /**
      * Initializes the object
      *
      * @param Decoder      $decoder
-     * @param ClaimFactory $claimFactory
      */
     public function __construct(
-        Decoder      $decoder = null,
-        ClaimFactory $claimFactory = null
+        ?Decoder $decoder = null,
     ) {
-        $this->decoder      = $decoder ?: new JoseEncoder();
-        $this->claimFactory = $claimFactory ?: new ClaimFactory();
+        $this->decoder = $decoder ?: new JoseEncoder();
     }
 
     /**
@@ -59,20 +49,14 @@ class Parser
      *
      * @param string $jwt
      *
-     * @return Token
+     * @return UnencryptedToken
      */
-    public function parse(string $jwt): Token
+    public function parse(string $jwt): UnencryptedToken
     {
         [$encodedHeaders, $encodedClaims, $encodedSignature] = $this->splitJwt($jwt);
         
         $header = $this->parseHeader($encodedHeaders);
         $claims = $this->parseClaims($encodedClaims);
-
-        foreach ($claims as $name => $value) {
-            if (isset($header[$name])) {
-                $header[$name] = $value;
-            }
-        }
 
         return new Token(
             new DataSet($header, $encodedHeaders),
@@ -112,7 +96,7 @@ class Parser
      */
     protected function parseHeader(string $data): array
     {
-        $header = $this->decoder->jsonDecode($this->decoder->base64UrlDecode($data));
+        $header = $this->decode($data);
 
         if (! is_array($header)) {
             throw InvalidTokenStructure::arrayExpected('headers');
@@ -140,7 +124,7 @@ class Parser
      */
     protected function parseClaims(string $data): array
     {
-        $claims = $this->decoder->jsonDecode($this->decoder->base64UrlDecode($data));
+        $claims = $this->decode($data);
 
         if (! is_array($claims)) {
             throw InvalidTokenStructure::arrayExpected('claims');
@@ -152,11 +136,23 @@ class Parser
             if (in_array($name, RegisteredClaims::DATE_CLAIMS)) {
                 $value = $this->convertDate($value);
             }
-            
-            $value = $this->claimFactory->create($name, $value);
         }
 
         return $claims;
+    }
+    
+    /**
+     * Returns the decoded data
+     *
+     * @param string $data
+     *
+     * @return array
+     */
+    private function decode(string $data): array
+    {
+        return $this->decoder->jsonDecode(
+            $this->decoder->base64UrlDecode($data)
+        );
     }
 
     /**

@@ -4,12 +4,10 @@ declare (strict_types = 1);
 
 namespace Larke\JWT\Contracts;
 
-use JsonSerializable;
-
 /**
  * Basic interface for token claims
  */
-interface Claim extends JsonSerializable
+interface Claim
 {
     /**
      * Returns the claim name

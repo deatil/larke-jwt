@@ -5,7 +5,6 @@ declare (strict_types = 1);
 namespace Larke\JWT\Contracts;
 
 use DateTimeInterface;
-use Larke\JWT\DataSet;
 
 interface Token
 {
@@ -55,7 +54,7 @@ interface Token
     /**
      * Returns if the token is expired
      */
-    public function isExpired(DateTimeInterface $now = null): bool;
+    public function isExpired(DateTimeInterface $now): bool;
 
     /**
      * Returns an encoded representation of the token

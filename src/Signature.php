@@ -4,13 +4,12 @@ declare (strict_types = 1);
 
 namespace Larke\JWT;
 
-use Larke\JWT\Contracts\Key;
-use Larke\JWT\Contracts\Signer;
+use Larke\JWT\Contracts\Signature as BaseSignature;
 
 /**
  * This class represents a token signature
  */
-class Signature
+final class Signature implements BaseSignature
 {
     /**
      * The resultant hash
@@ -30,6 +29,7 @@ class Signature
      * Initializes the object
      *
      * @param string $hash
+     * @param string $encoded
      */
     public function __construct(string $hash, string $encoded)
     {
@@ -41,21 +41,6 @@ class Signature
     public function hash(): string
     {
         return $this->hash;
-    }
-
-    /**
-     * Verifies if the current hash matches with with the result of the creation of
-     * a new signature with given data
-     *
-     * @param Signer $signer
-     * @param string $payload
-     * @param Key    $key
-     *
-     * @return boolean
-     */
-    public function verify(Signer $signer, string $payload, Key $key): bool
-    {
-        return $signer->verify($this->hash, $payload, $key);
     }
 
     /**

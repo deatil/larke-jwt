@@ -4,9 +4,6 @@ declare (strict_types = 1);
 
 namespace Larke\JWT\Contracts;
 
-use Larke\JWT\DataSet;
-use Larke\JWT\Signature;
-
 interface UnencryptedToken extends Token
 {
     /**

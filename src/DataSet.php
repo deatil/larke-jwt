@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Larke\JWT;
 
+use Larke\JWT\Contracts\DataSet as BaseDataSet;
+
 use function array_key_exists;
 
-final class DataSet
+final class DataSet implements BaseDataSet
 {
     private array $data;
     

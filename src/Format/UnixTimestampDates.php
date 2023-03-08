@@ -21,7 +21,7 @@ final class UnixTimestampDates implements ClaimsFormatter
                 continue;
             }
 
-            $claims[$claim] = $this->convertDate($claims[$claim]->getValue());
+            $claims[$claim] = $this->convertDate($claims[$claim]);
         }
 
         return $claims;

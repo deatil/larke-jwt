@@ -49,9 +49,9 @@ $token = (new Builder())
 $token->headers()->all(); // Retrieves the token headers
 $token->claims()->all(); // Retrieves the token claims
 
-echo $token->headers()->get('jti')->getValue(); // will print "4f1g23a12aa"
-echo $token->claims()->get('iss')->getValue(); // will print "http://example.com"
-echo $token->claims()->get('uid')->getValue(); // will print "1"
+echo $token->headers()->get('jti'); // will print "4f1g23a12aa"
+echo $token->claims()->get('iss'); // will print "http://example.com"
+echo $token->claims()->get('uid'); // will print "1"
 echo $token->toString(); // The string representation of the object is a JWT string (pretty easy, right?)
 ```
 
@@ -66,9 +66,9 @@ $token = (new Parser())->parse((string) $token); // Parses from a string
 $token->headers()->all(); // Retrieves the token headers
 $token->claims()->all(); // Retrieves the token claims
 
-echo $token->headers()->get('jti')->getValue(); // will print "4f1g23a12aa"
-echo $token->claims()->get('iss')->getValue(); // will print "http://example.com"
-echo $token->claims()->get('uid')->getValue(); // will print "1"
+echo $token->headers()->get('jti'); // will print "4f1g23a12aa"
+echo $token->claims()->get('iss'); // will print "http://example.com"
+echo $token->claims()->get('uid'); // will print "1"
 ```
 
 ### Validating
@@ -77,6 +77,7 @@ We can easily validate if the token is valid (using the previous token and time 
 
 ```php
 use DateTimeImmutable;
+use Larke\JWT\Validator;
 use Larke\JWT\ValidationData;
 
 $now = new DateTimeImmutable();
@@ -86,15 +87,17 @@ $data->issuedBy('http://example.com');
 $data->permittedFor('http://example.org');
 $data->identifiedBy('4f1g23a12aa');
 
-var_dump($token->validate($data)); // false, because token cannot be used before now() + 60
+$validation = new Validator();
+
+var_dump($validation->validate($token, $data)); // false, because token cannot be used before now() + 60
 
 $data->currentTime($now->modify('+61 seconds')); // changing the validation time to future
 
-var_dump($token->validate($data)); // true, because current time is between "nbf" and "exp" claims
+var_dump($validation->validate($token, $data)); // true, because current time is between "nbf" and "exp" claims
 
 $data->currentTime($now->modify('+4000 seconds')); // changing the validation time to future
 
-var_dump($token->validate($data)); // false, because token is expired since current time is greater than exp
+var_dump($validation->validate($token, $data)); // false, because token is expired since current time is greater than exp
 
 // We can also use the $leeway parameter to deal with clock skew (see notes below)
 // If token's claimed now is invalid but the difference between that and the validation time is less than $leeway, 
@@ -104,19 +107,19 @@ $dataWithLeeway->issuedBy('http://example.com');
 $dataWithLeeway->permittedFor('http://example.org');
 $dataWithLeeway->identifiedBy('4f1g23a12aa');
 
-var_dump($token->validate($dataWithLeeway)); // false, because token can't be used before now() + 60, not within leeway
+var_dump($validation->validate($token, $dataWithLeeway)); // false, because token can't be used before now() + 60, not within leeway
 
 $dataWithLeeway->currentTime($now->modify('+51 seconds')); // changing the validation time to future
 
-var_dump($token->validate($dataWithLeeway)); // true, because current time plus leeway is between "nbf" and "exp" claims
+var_dump($validation->validate($token, $dataWithLeeway)); // true, because current time plus leeway is between "nbf" and "exp" claims
 
 $dataWithLeeway->currentTime($now->modify('+3610 seconds')); // changing the validation time to future but within leeway
 
-var_dump($token->validate($dataWithLeeway)); // true, because current time - 20 seconds leeway is less than exp
+var_dump($validation->validate($token, $dataWithLeeway)); // true, because current time - 20 seconds leeway is less than exp
 
 $dataWithLeeway->currentTime($now->modify('+4000 seconds')); // changing the validation time to future outside of leeway
 
-var_dump($token->validate($dataWithLeeway)); // false, because token is expired since current time is greater than exp
+var_dump($validation->validate($token, $dataWithLeeway)); // false, because token is expired since current time is greater than exp
 ```
 
 #### Important
@@ -151,6 +154,7 @@ Hmac signatures are really simple to be used:
 ```php
 use DateTimeImmutable;
 use Larke\JWT\Builder;
+use Larke\JWT\Validator;
 use Larke\JWT\Signer\Hmac\Sha256;
 use Larke\JWT\Signer\Key\InMemory;
 
@@ -171,8 +175,10 @@ $token = (new Builder())
 $key1 = InMemory::plainText('testing 1');
 $key2 = InMemory::plainText('testing');
 
-var_dump($token->verify($signer, $key1)); // false, because the key is different
-var_dump($token->verify($signer, $key2)); // true, because the key is the same
+$validation = new Validator();
+
+var_dump($validation->verify($token, $signer, $key1)); // false, because the key is different
+var_dump($validation->verify($token, $signer, $key2)); // true, because the key is the same
 ```
 
 ### RSA, ECDSA and EdDSA
@@ -182,6 +188,7 @@ RSA, ECDSA and EdDSA signatures are based on public and private keys so you have
 ```php
 use DateTimeImmutable;
 use Larke\JWT\Builder;
+use Larke\JWT\Validator;
 use Larke\JWT\Signer\Key\LocalFileReference;
 use Larke\JWT\Signer\Rsa\Sha256; // you can use Larke\JWT\Signer\Ecdsa\Sha256 if you're using ECDSA keys
 
@@ -201,7 +208,9 @@ $token = (new Builder())
 
 $publicKey = LocalFileReference::file('file://{path to your public key}');
 
-var_dump($token->verify($signer, $publicKey)); // true when the public key was generated by the private one =)
+$validation = new Validator();
+
+var_dump($validation->verify($token, $signer, $publicKey)); // true when the public key was generated by the private one =)
 ```
 
 **It's important to say that if you're using RSA keys you shouldn't invoke ECDSA signers (and vice-versa), otherwise ```sign()``` and ```verify()``` will raise an exception!**

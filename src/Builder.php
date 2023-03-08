@@ -10,18 +10,17 @@ use Larke\JWT\Contracts\Key;
 use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Contracts\Encoder;
 use Larke\JWT\Contracts\ClaimsFormatter;
+use Larke\JWT\Contracts\UnencryptedToken;
 use Larke\JWT\Encoding\JoseEncoder;
-use Larke\JWT\Claim\Factory as ClaimFactory;
 use Larke\JWT\Claim\RegisteredClaims;
 use Larke\JWT\Claim\RegisteredHeaders;
 use Larke\JWT\Format\ChainedFormatter;
-
-use function implode;
+use Larke\JWT\Exception\RegisteredClaimGiven;
 
 /**
  * This class makes easier the token creation process
  */
-class Builder
+final class Builder
 {
     /**
      * The token header
@@ -48,13 +47,6 @@ class Builder
     private Encoder $encoder;
 
     /**
-     * The factory of claims
-     *
-     * @var ClaimFactory
-     */
-    private ClaimFactory $claimFactory;
-
-    /**
      * The formatter of claims
      *
      * @var ClaimsFormatter
@@ -65,16 +57,13 @@ class Builder
      * Initializes a new builder
      *
      * @param Encoder         $encoder
-     * @param ClaimFactory    $claimFactory
      * @param ClaimsFormatter $claimFormatter
      */
     public function __construct(
-        Encoder         $encoder = null,
-        ClaimFactory    $claimFactory = null,
-        ClaimsFormatter $claimFormatter = null
+        ?Encoder         $encoder = null,
+        ?ClaimsFormatter $claimFormatter = null
     ) {
         $this->encoder        = $encoder ?: new JoseEncoder();
-        $this->claimFactory   = $claimFactory ?: new ClaimFactory();
         $this->claimFormatter = $claimFormatter ?: ChainedFormatter::withUnixTimestampDates();
     }
 
@@ -82,111 +71,84 @@ class Builder
      * Configures the audience
      *
      * @param string $audience
-     * @param bool   $replicateAsHeader
      *
      * @return Builder
      */
-    public function permittedFor(string $audience, bool $replicateAsHeader = false): self
+    public function permittedFor(string $audience): self
     {
-        return $this->withRegisteredClaim(RegisteredClaims::AUDIENCE, $audience, $replicateAsHeader);
+        return $this->setClaim(RegisteredClaims::AUDIENCE, $audience);
     }
 
     /**
      * Configures the expiration time, expirTime
      *
      * @param DateTimeImmutable $expiration
-     * @param boolean           $replicateAsHeader
      *
      * @return Builder
      */
-    public function expiresAt(DateTimeImmutable $expiration, bool $replicateAsHeader = false): self
+    public function expiresAt(DateTimeImmutable $expiration): self
     {
-        return $this->withRegisteredClaim(RegisteredClaims::EXPIRATION_TIME, $expiration, $replicateAsHeader);
+        return $this->setClaim(RegisteredClaims::EXPIRATION_TIME, $expiration);
     }
 
     /**
      * Configures the token id JwtId
      *
-     * @param string  $id
-     * @param boolean $replicateAsHeader
+     * @param string $id
      *
      * @return Builder
      */
-    public function identifiedBy(string $id, bool $replicateAsHeader = false): self
+    public function identifiedBy(string $id): self
     {
-        return $this->withRegisteredClaim(RegisteredClaims::ID, $id, $replicateAsHeader);
+        return $this->setClaim(RegisteredClaims::ID, $id);
     }
 
     /**
      * Configures the time that the token was issued
      *
      * @param DateTimeImmutable $issuedAt
-     * @param boolean           $replicateAsHeader
      *
      * @return Builder
      */
-    public function issuedAt(DateTimeImmutable $issuedAt, bool $replicateAsHeader = false): self
+    public function issuedAt(DateTimeImmutable $issuedAt): self
     {
-        return $this->withRegisteredClaim(RegisteredClaims::ISSUED_AT, $issuedAt, $replicateAsHeader);
+        return $this->setClaim(RegisteredClaims::ISSUED_AT, $issuedAt);
     }
 
     /**
      * Configures the issuer
      *
-     * @param string  $issuer
-     * @param boolean $replicateAsHeader
+     * @param string $issuer
      *
      * @return Builder
      */
-    public function issuedBy(string $issuer, bool $replicateAsHeader = false): self
+    public function issuedBy(string $issuer): self
     {
-        return $this->withRegisteredClaim(RegisteredClaims::ISSUER, $issuer, $replicateAsHeader);
+        return $this->setClaim(RegisteredClaims::ISSUER, $issuer);
     }
 
     /**
      * Configures the time before which the token cannot be accepted
      *
      * @param DateTimeImmutable $notBefore
-     * @param boolean           $replicateAsHeader
      *
      * @return Builder
      */
-    public function canOnlyBeUsedAfter(DateTimeImmutable $notBefore, bool $replicateAsHeader = false): self
+    public function canOnlyBeUsedAfter(DateTimeImmutable $notBefore): self
     {
-        return $this->withRegisteredClaim(RegisteredClaims::NOT_BEFORE, $notBefore, $replicateAsHeader);
+        return $this->setClaim(RegisteredClaims::NOT_BEFORE, $notBefore);
     }
 
     /**
      * Configures the subject
      *
      * @param string  $subject
-     * @param boolean $replicateAsHeader
      *
      * @return Builder
      */
-    public function relatedTo(string $subject, bool $replicateAsHeader = false): self
+    public function relatedTo(string $subject): self
     {
-        return $this->withRegisteredClaim(RegisteredClaims::SUBJECT, $subject, $replicateAsHeader);
-    }
-
-    /**
-     * Configures a registered claim
-     *
-     * @param string  $name
-     * @param mixed   $value
-     * @param boolean $replicate
-     *
-     * @return Builder
-     */
-    protected function withRegisteredClaim(string $name, mixed $value, bool $replicate): self
-    {
-        $this->withClaim($name, $value);
-
-        if ($replicate) {
-            $this->headers[$name] = $this->claims[$name];
-        }
-
-        return $this;
+        return $this->setClaim(RegisteredClaims::SUBJECT, $subject);
     }
 
     /**
@@ -199,7 +161,7 @@ class Builder
      */
     public function withHeader(string $name, mixed $value): self
     {
-        $this->headers[$name] = $this->claimFactory->create($name, $value);
+        $this->headers[$name] = $value;
 
         return $this;
     }
@@ -214,7 +176,17 @@ class Builder
      */
     public function withClaim(string $name, mixed $value): self
     {
-        $this->claims[$name] = $this->claimFactory->create($name, $value);
+        if (in_array($name, RegisteredClaims::ALL, true)) {
+            throw RegisteredClaimGiven::forClaim($name);
+        }
+
+        return $this->setClaim($name, $value);
+    }
+
+    /** @param non-empty-string $name */
+    private function setClaim(string $name, mixed $value): self
+    {
+        $this->claims[$name] = $value;
 
         return $this;
     }
@@ -236,9 +208,9 @@ class Builder
     /**
      * Returns the resultant token
      *
-     * @return Token
+     * @return UnencryptedToken
      */
-    public function getToken(Signer $signer, Key $key): Token
+    public function getToken(Signer $signer, Key $key): UnencryptedToken
     {
         $signer->modifyHeader($this->headers);
         

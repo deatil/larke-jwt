@@ -52,14 +52,6 @@ class Basic implements Claim
     /**
      * {@inheritdoc}
      */
-    public function jsonSerialize(): mixed
-    {
-        return $this->value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return (string) $this->value;
