@@ -10,6 +10,7 @@ use Larke\JWT\Contracts\Key;
 use Larke\JWT\Contracts\Signer;
 use Larke\JWT\Contracts\Validatable;
 use Larke\JWT\Contracts\ValidationData;
+use Larke\JWT\Contracts\UnencryptedToken;
 use Larke\JWT\Claim\RegisteredHeaders;
 use Larke\JWT\Claim\Factory as ClaimFactory;
 
@@ -23,7 +24,7 @@ final class Validator
         $this->claimFactory = $claimFactory ?: new ClaimFactory();
     }
 
-    public function verify(Token $token, Signer $signer, Key $key): bool
+    public function verify(UnencryptedToken $token, Signer $signer, Key $key): bool
     {
         if ($token->headers()->get(RegisteredHeaders::ALGORITHM) !== $signer->getAlgorithmId()) {
             return false;
@@ -35,7 +36,7 @@ final class Validator
         return $signer->verify($hash, $payload, $key);
     }
 
-    public function validate(Token $token, ValidationData $data): bool
+    public function validate(UnencryptedToken $token, ValidationData $data): bool
     {
         foreach ($this->getValidatableClaims($token) as $claim) {
             if (! $claim->validate($data)) {
@@ -46,7 +47,7 @@ final class Validator
         return true;
     }
 
-    private function getValidatableClaims(Token $token): Generator
+    private function getValidatableClaims(UnencryptedToken $token): Generator
     {
         foreach ($token->claims()->all() as $name => $value) {
             $claim = $this->claimFactory->create($name, $value);
