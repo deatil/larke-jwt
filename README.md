@@ -3,7 +3,7 @@
 A simple library to work with JSON Web Token and JSON Web Signature (requires PHP 5.6+).
 The implementation is based on the [RFC 7519](https://tools.ietf.org/html/rfc7519).
 
-The `code` is from [lcobucci/jwt](https://github.com/lcobucci/jwt)
+The `code` is forked from [lcobucci/jwt](https://github.com/lcobucci/jwt)
 
 
 ## Installation
