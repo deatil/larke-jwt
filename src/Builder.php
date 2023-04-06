@@ -70,13 +70,16 @@ final class Builder
     /**
      * Configures the audience
      *
-     * @param string $audience
+     * @param string $audiences
      *
      * @return Builder
      */
-    public function permittedFor(string $audience): self
+    public function permittedFor(string ...$audiences): self
     {
-        return $this->setClaim(RegisteredClaims::AUDIENCE, $audience);
+        $configured = $this->claims[RegisteredClaims::AUDIENCE] ?? [];
+        $toAppend   = array_diff($audiences, $configured);
+
+        return $this->setClaim(RegisteredClaims::AUDIENCE, array_merge($configured, $toAppend));
     }
 
     /**

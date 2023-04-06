@@ -18,12 +18,12 @@ final class ChainedFormatter implements ClaimsFormatter
 
     public static function default(): self
     {
-        return new self(new MicrosecondBasedDateConversion());
+        return new self(new UnifyAudience(), new MicrosecondBasedDateConversion());
     }
 
     public static function withUnixTimestampDates(): self
     {
-        return new self(new UnixTimestampDates());
+        return new self(new UnifyAudience(), new UnixTimestampDates());
     }
 
     /** @inheritdoc */
