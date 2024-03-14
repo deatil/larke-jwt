@@ -16,7 +16,7 @@ composer require lake/larke-jwt
 
 ### Dependencies
 
-- PHP 8.1.0+
+- PHP >= 8.1.0
 - OpenSSL Extension
 - sodium Extension
 
